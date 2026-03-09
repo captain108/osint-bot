@@ -462,7 +462,7 @@ Owner: {OWNER_USERNAME}
 async def num(update, context):
     if context.args: await call_api(update, NUM_API, context.args[0])
 
-async def info(update, context):
+async def tg(update, context):
     if context.args: await call_api(update, TG_API, context.args[0])
 
 async def veh(update, context):
@@ -476,6 +476,9 @@ async def insta(update, context):
 
 async def fam(update, context):
     if context.args: await call_api(update, FAM_API, context.args[0])
+
+async def ff(update, context):
+    if context.args: await call_api(update, FF_API, context.args[0])
 
 # ================= JSON DOWNLOAD =================
 
@@ -544,18 +547,19 @@ def main():
     app.add_handler(CommandHandler("buy", buy))
 
     app.add_handler(CommandHandler("num", num))
-    app.add_handler(CommandHandler("tg", info))
+    app.add_handler(CommandHandler("tg", tg))
     app.add_handler(CommandHandler("veh", veh))
     app.add_handler(CommandHandler("upi", upi))
     app.add_handler(CommandHandler("insta", insta))
     app.add_handler(CommandHandler("fam", fam))
+    app.add_handler(CommandHandler("ff", ff))
 
     app.add_handler(CommandHandler("addpremium", addpremium))
     app.add_handler(CommandHandler("broadcast", broadcast))
     app.add_handler(CommandHandler("approvegc", approvegc))
     app.add_handler(CommandHandler("gclist", gclist))
     app.add_handler(CommandHandler("stats", stats))
-    app.add_handler(CommandHandler("ff", ff))
+    
 
     app.add_handler(CallbackQueryHandler(json_download, pattern="json_"))
 
