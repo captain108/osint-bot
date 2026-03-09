@@ -302,7 +302,7 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         for chat_id in targets:
             try:
-                await msg.copy(chat_id)
+                await msg.copy(chat_id=chat_id)
                 sent += 1
                 await asyncio.sleep(0.05)
             except:
