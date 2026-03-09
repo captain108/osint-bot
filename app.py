@@ -27,6 +27,7 @@ USAGE_FILE = "usage.json"
 PREMIUM_FILE = "premium.json"
 USERS_FILE = "users.json"
 GC_FILE = "approved_gc.json"
+GROUPS_FILE = "groups.json"
 
 CACHE = {}
 
@@ -76,6 +77,27 @@ def load_gc():
 def save_gc(groups):
     with open(GC_FILE, "w") as f:
         json.dump(groups, f, indent=2)
+
+# ================= GROUP LIST DATABASE =================
+
+def load_groups():
+    try:
+        with open(GROUPS_FILE, "r") as f:
+            return json.load(f)
+    except:
+        return []
+
+def save_groups(groups):
+    with open(GROUPS_FILE, "w") as f:
+        json.dump(groups, f)
+
+def add_group(chat_id):
+
+    groups = load_groups()
+
+    if chat_id not in groups:
+        groups.append(chat_id)
+        save_groups(groups)
 
 # ================= DAILY LIMIT =================
 
@@ -156,6 +178,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     add_user(user_id)
 
+    chat = update.effective_chat
+
+    if chat.type in ["group", "supergroup"]:
+        add_group(chat.id)
+
     premium = get_remaining(user_id)
 
     if premium:
@@ -185,9 +212,9 @@ Commands
 
 Owner: {OWNER_USERNAME}
 """,
-reply_markup=InlineKeyboardMarkup(keyboard)
-)
-
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+    
 # ================= PREMIUM STATUS =================
 
 async def premium(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -262,22 +289,42 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
         return
 
-    message = " ".join(context.args)
-
     users = load_users()
+    groups = load_groups()
+    targets = users + groups
 
     sent = 0
 
-    for user in users:
+    # reply broadcast
+    if update.message.reply_to_message:
 
-        try:
-            await context.bot.send_message(user, message)
-            sent += 1
-            await asyncio.sleep(0.05)
-        except:
-            pass
+        msg = update.message.reply_to_message
 
-    await update.message.reply_text(f"Broadcast sent to {sent} users.")
+        for chat_id in targets:
+            try:
+                await msg.copy(chat_id)
+                sent += 1
+                await asyncio.sleep(0.05)
+            except:
+                pass
+
+    else:
+
+        message = update.message.text.replace("/broadcast", "", 1).strip()
+
+        if not message:
+            await update.message.reply_text("Usage:\n/broadcast message\nor reply to a message with /broadcast")
+            return
+
+        for chat_id in targets:
+            try:
+                await context.bot.send_message(chat_id, message)
+                sent += 1
+                await asyncio.sleep(0.05)
+            except:
+                pass
+
+    await update.message.reply_text(f"📢 Broadcast sent to {sent} chats.")
 
 # ================= APPROVE GC =================
 
