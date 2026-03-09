@@ -22,6 +22,7 @@ VEH_API = os.getenv("VEH_API")
 UPI_API = os.getenv("UPI_API")
 INSTA_API = os.getenv("INSTA_API")
 FAM_API = os.getenv("FAM_API")
+FF_API = os.getenv("FF_API")
 
 USAGE_FILE = "usage.json"
 PREMIUM_FILE = "premium.json"
@@ -205,6 +206,7 @@ Commands
 
 /num NUMBER
 /info TG_ID
+/ff uid
 /veh VEHICLE_NO
 /upi UPI_ID
 /insta USERNAME
@@ -553,6 +555,7 @@ def main():
     app.add_handler(CommandHandler("approvegc", approvegc))
     app.add_handler(CommandHandler("gclist", gclist))
     app.add_handler(CommandHandler("stats", stats))
+    app.add_handler(CommandHandler("ff", ff))
 
     app.add_handler(CallbackQueryHandler(json_download, pattern="json_"))
 
