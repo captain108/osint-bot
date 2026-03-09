@@ -13,7 +13,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 OWNER_ID = int(os.getenv("OWNER_ID", "0"))
 
-BOT_NAME = os.getenv("BOT_NAME", "LegendX Info Bot")
+BOT_NAME = os.getenv("BOT_NAME", "cap X Info Bot")
 OWNER_USERNAME = os.getenv("OWNER_USERNAME", "@captainpapaj1")
 
 NUM_API = os.getenv("NUM_API")
@@ -324,7 +324,7 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except:
                 pass
 
-    await update.message.reply_text(f"📢 Broadcast sent to {sent} chats.")
+    await context.bot.send_message(update.effective_chat.id, f"📢 Broadcast sent to {sent} chats.")
 
 # ================= APPROVE GC =================
 
