@@ -299,7 +299,27 @@ async def approvegc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         save_gc(groups)
 
     await update.message.reply_text("✅ This group has been approved.")
-    
+
+# ================= GC LIST =================
+
+async def gclist(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    groups = load_gc()
+
+    if not groups:
+        await update.message.reply_text("❌ No approved groups.")
+        return
+
+    text = "✅ Approved Groups:\n\n"
+
+    for gid in groups:
+        text += f"{gid}\n"
+
+    await update.message.reply_text(text)
+
 # ================= API CALL =================
 
 async def call_api(update, api_url, value):
@@ -454,6 +474,7 @@ def main():
     app.add_handler(CommandHandler("addpremium", addpremium))
     app.add_handler(CommandHandler("broadcast", broadcast))
     app.add_handler(CommandHandler("approvegc", approvegc))
+    app.add_handler(CommandHandler("gclist", gclist))
 
     app.add_handler(CallbackQueryHandler(json_download, pattern="json_"))
 
