@@ -305,11 +305,24 @@ async def approvegc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def call_api(update, api_url, value):
 
     user_id = update.effective_user.id
+    chat = update.effective_chat
 
-    if not is_premium(user_id):
+    # ---- LIMIT CHECK ----
+    limit_needed = True
 
+    # Premium users -> no limit
+    if is_premium(user_id):
+        limit_needed = False
+
+    # Approved groups -> no limit
+    if chat.type in ["group", "supergroup"]:
+        groups = load_gc()
+        if chat.id in groups:
+            limit_needed = False
+
+    # Apply daily limit only if needed
+    if limit_needed:
         if not check_daily_limit(user_id):
-
             await update.message.reply_text(
 f"""
 🚫 Daily limit reached
@@ -318,9 +331,10 @@ Upgrade to premium.
 
 Owner: {OWNER_USERNAME}
 """
-)
+            )
             return
 
+    # ---- API REQUEST ----
     try:
 
         r = requests.get(api_url.format(value), timeout=15)
@@ -343,7 +357,7 @@ Owner: {OWNER_USERNAME}
 
     except:
         await update.message.reply_text("API Error")
-
+        
 # ================= COMMAND WRAPPERS =================
 
 async def num(update, context):
