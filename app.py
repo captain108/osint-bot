@@ -26,6 +26,7 @@ FAM_API = os.getenv("FAM_API")
 USAGE_FILE = "usage.json"
 PREMIUM_FILE = "premium.json"
 USERS_FILE = "users.json"
+GC_FILE = "approved_gc.json"
 
 CACHE = {}
 
@@ -62,6 +63,19 @@ def add_user(user_id):
     if user_id not in users:
         users.append(user_id)
         save_users(users)
+
+# ================= GROUP DATABASE =================
+
+def load_gc():
+    try:
+        with open(GC_FILE, "r") as f:
+            return json.load(f)
+    except:
+        return []
+
+def save_gc(groups):
+    with open(GC_FILE, "w") as f:
+        json.dump(groups, f, indent=2)
 
 # ================= DAILY LIMIT =================
 
@@ -265,6 +279,27 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(f"Broadcast sent to {sent} users.")
 
+# ================= APPROVE GC =================
+
+async def approvegc(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    chat = update.effective_chat
+
+    if chat.type not in ["group", "supergroup"]:
+        await update.message.reply_text("❌ This command must be used in a group.")
+        return
+
+    groups = load_gc()
+
+    if chat.id not in groups:
+        groups.append(chat.id)
+        save_gc(groups)
+
+    await update.message.reply_text("✅ This group has been approved.")
+    
 # ================= API CALL =================
 
 async def call_api(update, api_url, value):
@@ -404,6 +439,7 @@ def main():
 
     app.add_handler(CommandHandler("addpremium", addpremium))
     app.add_handler(CommandHandler("broadcast", broadcast))
+    app.add_handler(CommandHandler("approvegc", approvegc))
 
     app.add_handler(CallbackQueryHandler(json_download, pattern="json_"))
 
