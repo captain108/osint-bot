@@ -367,6 +367,36 @@ async def gclist(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(text)
 
+# ================= STATS =================
+
+async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    users = load_users()
+    groups = load_groups()
+    premium = load_premium()
+    usage = load_json(USAGE_FILE)
+
+    total_users = len(users)
+    total_groups = len(groups)
+    total_premium = len(premium)
+    total_requests = len(usage)
+
+    await update.message.reply_text(
+f"""
+📊 {BOT_NAME} Stats
+
+👤 Users: {total_users}
+👥 Groups: {total_groups}
+⭐ Premium Users: {total_premium}
+📈 Requests Today: {total_requests}
+
+Owner: {OWNER_USERNAME}
+"""
+    )
+
 # ================= API CALL =================
 
 async def call_api(update, api_url, value):
@@ -522,6 +552,7 @@ def main():
     app.add_handler(CommandHandler("broadcast", broadcast))
     app.add_handler(CommandHandler("approvegc", approvegc))
     app.add_handler(CommandHandler("gclist", gclist))
+    app.add_handler(CommandHandler("stats", stats))
 
     app.add_handler(CallbackQueryHandler(json_download, pattern="json_"))
 
