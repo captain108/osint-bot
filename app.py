@@ -543,8 +543,8 @@ def main():
     app.add_handler(CommandHandler("premium", premium))
     app.add_handler(CommandHandler("buy", buy))
 
-    app.add_handler(CommandHandler("tg", tg))
-    app.add_handler(CommandHandler("info", info))
+    app.add_handler(CommandHandler("num", num))
+    app.add_handler(CommandHandler("tg", info))
     app.add_handler(CommandHandler("veh", veh))
     app.add_handler(CommandHandler("upi", upi))
     app.add_handler(CommandHandler("insta", insta))
