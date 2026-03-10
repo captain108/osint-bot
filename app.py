@@ -23,6 +23,9 @@ UPI_API = os.getenv("UPI_API")
 INSTA_API = os.getenv("INSTA_API")
 FAM_API = os.getenv("FAM_API")
 FF_API = os.getenv("FF_API")
+RESULT_MODE = os.getenv("RESULT_MODE", "json")
+# json  = raw API JSON
+# pretty = formatted UX result
 
 USAGE_FILE = "usage.json"
 PREMIUM_FILE = "premium.json"
@@ -409,14 +412,14 @@ def format_result(data):
     if "data" not in data:
         return json.dumps(data, indent=2)
 
-    results = data["data"]
+    results = data.get("data", [])
 
     if not results:
-        return "❌ No result found."
+        return "❌ No results found."
 
     text = "🔎 Search Result\n\n"
 
-    for item in results[:5]:   # show max 5 results
+    for item in results[:5]:
 
         name = item.get("name", "N/A")
         father = item.get("father_name", "N/A")
@@ -497,7 +500,10 @@ Owner: {OWNER_USERNAME}
         uid = str(uuid.uuid4())
         CACHE[uid] = data
 
-        preview = format_result(data)
+        if RESULT_MODE == "ui":
+            preview = format_result(data)
+        else:
+            preview = json.dumps(data, indent=2)[:3500]
 
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("📄 Full JSON", callback_data=f"json_{uid}")]
