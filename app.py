@@ -576,6 +576,24 @@ Owner: {OWNER_USERNAME}
         # Default = raw JSON
         else:
             preview = json.dumps(data, indent=2)[:3500]
+
+        # Create button list
+        buttons = []
+
+        # If Telegram lookup add open profile button
+        if api_url == TG_API:
+            number = data.get("number")
+            if number:
+                buttons.append(
+                    [InlineKeyboardButton("👤 Open Telegram", url=f"tg://user?id={number}")]
+                )
+
+        # JSON download button
+        buttons.append(
+            [InlineKeyboardButton("📄 Full JSON", callback_data=f"json_{uid}")]
+        )
+
+        keyboard = InlineKeyboardMarkup(buttons)
         # Create button list
 buttons = []
 
