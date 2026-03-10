@@ -518,28 +518,97 @@ Owner: {OWNER_USERNAME}
     except Exception as e:
         await update.message.reply_text(f"API Error: {e}")
         
+# ================= VALUE HELPER =================
+
+def get_value(update, context):
+
+    if context.args:
+        return context.args[0]
+
+    if update.message.reply_to_message:
+        if update.message.reply_to_message.text:
+            return update.message.reply_to_message.text.strip()
+
+    return None
+
+
 # ================= COMMAND WRAPPERS =================
 
 async def num(update, context):
-    if context.args: await call_api(update, NUM_API, context.args[0])
+
+    value = get_value(update, context)
+
+    if not value:
+        await update.message.reply_text("Usage:\n/num NUMBER\nor reply to number.")
+        return
+
+    await call_api(update, NUM_API, value)
+
 
 async def tg(update, context):
-    if context.args: await call_api(update, TG_API, context.args[0])
+
+    value = get_value(update, context)
+
+    if not value:
+        await update.message.reply_text("Usage:\n/tg TG_ID\nor reply to ID.")
+        return
+
+    await call_api(update, TG_API, value)
+
 
 async def veh(update, context):
-    if context.args: await call_api(update, VEH_API, context.args[0])
+
+    value = get_value(update, context)
+
+    if not value:
+        await update.message.reply_text("Usage:\n/veh VEHICLE_NO\nor reply to vehicle.")
+        return
+
+    await call_api(update, VEH_API, value)
+
 
 async def upi(update, context):
-    if context.args: await call_api(update, UPI_API, context.args[0])
+
+    value = get_value(update, context)
+
+    if not value:
+        await update.message.reply_text("Usage:\n/upi UPI_ID\nor reply to UPI.")
+        return
+
+    await call_api(update, UPI_API, value)
+
 
 async def insta(update, context):
-    if context.args: await call_api(update, INSTA_API, context.args[0])
+
+    value = get_value(update, context)
+
+    if not value:
+        await update.message.reply_text("Usage:\n/insta USERNAME\nor reply to username.")
+        return
+
+    await call_api(update, INSTA_API, value)
+
 
 async def fam(update, context):
-    if context.args: await call_api(update, FAM_API, context.args[0])
+
+    value = get_value(update, context)
+
+    if not value:
+        await update.message.reply_text("Usage:\n/fam MOBILE\nor reply to number.")
+        return
+
+    await call_api(update, FAM_API, value)
+
 
 async def ff(update, context):
-    if context.args: await call_api(update, FF_API, context.args[0])
+
+    value = get_value(update, context)
+
+    if not value:
+        await update.message.reply_text("Usage:\n/ff UID\nor reply to UID.")
+        return
+
+    await call_api(update, FF_API, value)
 
 # ================= JSON DOWNLOAD =================
 
