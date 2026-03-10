@@ -205,7 +205,7 @@ f"""
 Commands
 
 /num NUMBER
-/info TG_ID
+/tg TG_ID
 /ff uid
 /veh VEHICLE_NO
 /upi UPI_ID
@@ -433,11 +433,20 @@ Owner: {OWNER_USERNAME}
             )
             return
 
-    # ---- API REQUEST ----
+        # ---- API REQUEST ----
     try:
 
         r = requests.get(api_url.format(value), timeout=15)
-        data = r.json()
+
+        if r.status_code != 200:
+            await update.message.reply_text("❌ API Server Error")
+            return
+
+        try:
+            data = r.json()
+        except:
+            await update.message.reply_text("❌ API returned invalid JSON")
+            return
 
         uid = str(uuid.uuid4())
         CACHE[uid] = data
@@ -454,8 +463,8 @@ Owner: {OWNER_USERNAME}
             reply_markup=keyboard
         )
 
-    except:
-        await update.message.reply_text("API Error")
+    except Exception as e:
+        await update.message.reply_text(f"API Error: {e}")
         
 # ================= COMMAND WRAPPERS =================
 
