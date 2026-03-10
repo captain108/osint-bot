@@ -4,6 +4,7 @@ import time
 import uuid
 import asyncio
 import requests
+import html
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
@@ -205,7 +206,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 ]
 
-await update.message.reply_text(
+    await update.message.reply_text(
 f"""
 ╭━━━〔 🔎 {BOT_NAME} 〕━━━╮
 
