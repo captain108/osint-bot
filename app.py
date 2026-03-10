@@ -24,7 +24,7 @@ UPI_API = os.getenv("UPI_API")
 INSTA_API = os.getenv("INSTA_API")
 FAM_API = os.getenv("FAM_API")
 FF_API = os.getenv("FF_API")
-RESULT_MODE = os.getenv("RESULT_MODE", "json")
+RESULT_MODE = os.getenv("RESULT_MODE", "ui")
 # json  = raw API JSON
 # pretty = formatted UX result
 
