@@ -409,9 +409,6 @@ def format_result(data):
     if not isinstance(data, dict):
         return str(data)
 
-    if "data" not in data:
-        return json.dumps(data, indent=2)
-
     results = data.get("data", [])
 
     if not results:
@@ -421,30 +418,26 @@ def format_result(data):
 
     for item in results[:5]:
 
-        name = item.get("name", "N/A")
-        father = item.get("father_name", "N/A")
-        mobile = item.get("mobile", "N/A")
-        alt = item.get("alt_mobile", "N/A")
-        circle = item.get("circle", "N/A")
-        address = item.get("address", "N/A")
-        email = item.get("email", "N/A")
-        idn = item.get("id_number", "N/A")
+        name = item.get("name", "-")
+        father = item.get("father_name", "-")
+        mobile = item.get("mobile", "-")
+        alt = item.get("alt_mobile", "-")
+        circle = item.get("circle", "-")
+        address = item.get("address", "-")
+        email = item.get("email", "-")
+        idn = item.get("id_number", "-")
 
-        text += f"""
-👤 Name: {name}
-👨 Father: {father}
-📱 Mobile: {mobile}
-📞 Alt: {alt}
-📍 Circle: {circle}
-
-🏠 Address:
-{address}
-
-🆔 ID: {idn}
-📧 Email: {email}
-
-━━━━━━━━━━━━━━
-"""
+        text += (
+            f"👤 Name: {name}\n"
+            f"👨 Father: {father}\n"
+            f"📱 Mobile: {mobile}\n"
+            f"📞 Alt: {alt}\n"
+            f"📍 Circle: {circle}\n\n"
+            f"🏠 Address:\n{address}\n\n"
+            f"🆔 ID: {idn}\n"
+            f"📧 Email: {email}\n"
+            "━━━━━━━━━━━━━━━━\n\n"
+        )
 
     return text[:4000]
 
@@ -510,7 +503,8 @@ Owner: {OWNER_USERNAME}
         ])
 
         await update.message.reply_text(
-    preview,
+    f"```\n{preview}\n```",
+    parse_mode="Markdown",
     reply_markup=keyboard
 )
 
