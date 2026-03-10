@@ -510,10 +510,9 @@ Owner: {OWNER_USERNAME}
         ])
 
         await update.message.reply_text(
-            f"```\n{preview}\n```",
-            parse_mode="Markdown",
-            reply_markup=keyboard
-        )
+    preview,
+    reply_markup=keyboard
+)
 
     except Exception as e:
         await update.message.reply_text(f"API Error: {e}")
