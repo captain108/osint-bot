@@ -399,6 +399,52 @@ Owner: {OWNER_USERNAME}
 """
     )
 
+# ================= RESULT FORMATTER =================
+
+def format_result(data):
+
+    if not isinstance(data, dict):
+        return str(data)
+
+    if "data" not in data:
+        return json.dumps(data, indent=2)
+
+    results = data["data"]
+
+    if not results:
+        return "❌ No result found."
+
+    text = "🔎 Search Result\n\n"
+
+    for item in results[:5]:   # show max 5 results
+
+        name = item.get("name", "N/A")
+        father = item.get("father_name", "N/A")
+        mobile = item.get("mobile", "N/A")
+        alt = item.get("alt_mobile", "N/A")
+        circle = item.get("circle", "N/A")
+        address = item.get("address", "N/A")
+        email = item.get("email", "N/A")
+        idn = item.get("id_number", "N/A")
+
+        text += f"""
+👤 Name: {name}
+👨 Father: {father}
+📱 Mobile: {mobile}
+📞 Alt: {alt}
+📍 Circle: {circle}
+
+🏠 Address:
+{address}
+
+🆔 ID: {idn}
+📧 Email: {email}
+
+━━━━━━━━━━━━━━
+"""
+
+    return text[:4000]
+
 # ================= API CALL =================
 
 async def call_api(update, api_url, value):
@@ -451,7 +497,7 @@ Owner: {OWNER_USERNAME}
         uid = str(uuid.uuid4())
         CACHE[uid] = data
 
-        preview = json.dumps(data, indent=2)[:3500]
+        preview = format_result(data)
 
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("📄 Full JSON", callback_data=f"json_{uid}")]
