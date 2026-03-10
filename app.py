@@ -221,12 +221,12 @@ f"""
 
 📱 /num  → Mobile Number Info  
 👤 /tg   → Telegram User Info  
+🎮 /ff   → Free Fire UID Info
 🚗 /veh  → Vehicle Details  
 💳 /upi  → UPI Information  
 📷 /insta → Instagram Lookup  
 👪 /fam  → Family Members  
-🎮 /ff   → Free Fire UID Info  
-
+  
 ━━━━━━━━━━━━━━
 
 ⚡ Features
@@ -470,6 +470,49 @@ def format_result(data):
 
     return text[:4000]
 
+# ================= TELEGRAM RESULT FORMATTER =================
+
+def format_tg_result(data):
+
+    # If API response is not a dictionary
+    if not isinstance(data, dict):
+        return "❌ Invalid API response"
+
+    # If API returned status false
+    if not data.get("status"):
+        return "❌ No result found."
+
+    # Extract fields safely
+    country = data.get("country", "N/A")
+    code = data.get("country_code", "N/A")
+    number = data.get("number", "N/A")
+
+    # Extract time data
+    time_data = data.get("time_swap", {})
+
+    fetched = time_data.get("fetched_at", "N/A")
+    tz = time_data.get("timezone", "N/A")
+
+    # Build formatted message
+    text = f"""
+🔎 Telegram Lookup
+
+📱 API Result
+🌍 Country: {country}
+📞 Country Code: {code}
+🔢 Number: {number}
+
+⏱ Fetched At: {fetched}
+🕒 Timezone: {tz}
+
+━━━━━━━━━━━━━━
+
+🤖 Telegram Info
+🆔 Chat ID: {number}
+"""
+
+    return text
+
 # ================= API CALL =================
 
 async def call_api(update, api_url, value):
@@ -522,14 +565,34 @@ Owner: {OWNER_USERNAME}
         uid = str(uuid.uuid4())
         CACHE[uid] = data
 
-        if RESULT_MODE == "ui":
+        # If request was Telegram lookup
+        if api_url == TG_API:
+            preview = format_tg_result(data)
+
+        # Other APIs use normal formatter
+        elif RESULT_MODE == "ui":
             preview = format_result(data)
+
+        # Default = raw JSON
         else:
             preview = json.dumps(data, indent=2)[:3500]
+        # Create button list
+buttons = []
 
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("📄 Full JSON", callback_data=f"json_{uid}")]
-        ])
+        # If Telegram lookup add open profile button
+       if api_url == TG_API:
+           number = data.get("number")
+           if number:
+               buttons.append(
+                   [InlineKeyboardButton("👤 Open Telegram", url=f"tg://user?id={number}")]
+               )
+
+       # JSON download button
+       buttons.append(
+           [InlineKeyboardButton("📄 Full JSON", callback_data=f"json_{uid}")]
+       )
+
+       keyboard = InlineKeyboardMarkup(buttons)
 
         safe_preview = html.escape(preview)
 
