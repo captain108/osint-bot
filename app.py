@@ -509,8 +509,11 @@ Owner: {OWNER_USERNAME}
             [InlineKeyboardButton("📄 Full JSON", callback_data=f"json_{uid}")]
         ])
 
-        await update.message.reply_text(
-    preview,
+        safe_preview = html.escape(preview)
+
+await update.message.reply_text(
+    f"🔎 <b>Search Result</b>\n\n<pre>{safe_preview}</pre>",
+    parse_mode="HTML",
     reply_markup=keyboard
 )
 
