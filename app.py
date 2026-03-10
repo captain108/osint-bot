@@ -6,7 +6,7 @@ import asyncio
 import requests
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, ContextTypes, filters
 
 # ================= VARIABLES =================
 
@@ -663,6 +663,44 @@ async def premium_watcher(application):
 async def start_background(application):
     asyncio.create_task(premium_watcher(application))
 
+# ================= AUTO DETECT =================
+
+async def auto_detect(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    text = update.message.text.strip()
+
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("📱 Number Info", callback_data=f"auto_num_{text}")],
+        [InlineKeyboardButton("🆔 Telegram Info", callback_data=f"auto_tg_{text}")],
+        [InlineKeyboardButton("🎮 FF Info", callback_data=f"auto_ff_{text}")]
+    ])
+
+    await update.message.reply_text(
+        "🔎 Detected Input\n\nChoose lookup:",
+        reply_markup=keyboard
+    )
+
+# ================= AUTO BUTTON =================
+
+async def auto_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    query = update.callback_query
+    await query.answer()
+
+    data = query.data.split("_")
+
+    action = data[1]
+    value = data[2]
+
+    if action == "num":
+        await call_api(update, NUM_API, value)
+
+    elif action == "tg":
+        await call_api(update, TG_API, value)
+
+    elif action == "ff":
+        await call_api(update, FF_API, value)
+
 # ================= MAIN =================
 
 def main():
@@ -688,13 +726,13 @@ def main():
     app.add_handler(CommandHandler("approvegc", approvegc))
     app.add_handler(CommandHandler("gclist", gclist))
     app.add_handler(CommandHandler("stats", stats))
-    
 
-    app.add_handler(CallbackQueryHandler(json_download, pattern="json_"))
-
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, auto_detect))
+    app.add_handler(CallbackQueryHandler(auto_button, pattern="auto_"))
+   
     print(f"{BOT_NAME} Running")
 
-    app.run_polling()
+    app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
     main()
