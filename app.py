@@ -196,29 +196,50 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         status = "🆓 Free User\nLimit: 3 requests/day"
 
     keyboard = [
-        [InlineKeyboardButton("💳 Buy Premium", url=f"https://t.me/{OWNER_USERNAME.replace('@','')}")]
+    [
+        InlineKeyboardButton("🔎 Commands", callback_data="cmds"),
+        InlineKeyboardButton("⭐ Premium", callback_data="premiuminfo")
+    ],
+    [
+        InlineKeyboardButton("💳 Buy Premium", url=f"https://t.me/{OWNER_USERNAME.replace('@','')}")
     ]
+]
 
-    await update.message.reply_text(
+await update.message.reply_text(
 f"""
-🔎 {BOT_NAME}
+╭━━━〔 🔎 {BOT_NAME} 〕━━━╮
 
+👋 Welcome {update.effective_user.first_name}
+
+📊 Your Status
 {status}
 
-Commands
+━━━━━━━━━━━━━━
 
-/num NUMBER
-/tg TG_ID
-/ff uid
-/veh VEHICLE_NO
-/upi UPI_ID
-/insta USERNAME
-/fam MOBILE
+🔍 Available Lookups
 
-Owner: {OWNER_USERNAME}
+📱 /num  → Mobile Number Info  
+👤 /tg   → Telegram User Info  
+🚗 /veh  → Vehicle Details  
+💳 /upi  → UPI Information  
+📷 /insta → Instagram Lookup  
+👪 /fam  → Family Members  
+🎮 /ff   → Free Fire UID Info  
+
+━━━━━━━━━━━━━━
+
+⚡ Features
+• Fast API response
+• Cached results
+• Premium unlimited searches
+
+👑 Owner: {OWNER_USERNAME}
+
+╰━━━━━━━━━━━━━━━━╯
 """,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+    reply_markup=InlineKeyboardMarkup(keyboard),
+    parse_mode="HTML"
+)
     
 # ================= PREMIUM STATUS =================
 
