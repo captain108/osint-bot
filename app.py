@@ -533,11 +533,11 @@ Owner: {OWNER_USERNAME}
 
         safe_preview = html.escape(preview)
 
-await update.message.reply_text(
-    f"🔎 <b>Search Result</b>\n\n<pre>{safe_preview}</pre>",
-    parse_mode="HTML",
-    reply_markup=keyboard
-)
+        await update.message.reply_text(
+            f"🔎 <b>Search Result</b>\n\n<pre>{safe_preview}</pre>",
+            parse_mode="HTML",
+            reply_markup=keyboard
+        )
 
     except Exception as e:
         await update.message.reply_text(f"API Error: {e}")
