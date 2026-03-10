@@ -547,79 +547,89 @@ Owner: {OWNER_USERNAME}
             )
             return
 
-        # ---- API REQUEST ----
+    # =================  API REQUEST  =================
     try:
 
+        # Send request to API with the provided value
         r = requests.get(api_url.format(value), timeout=15)
 
+        # Check if API responded successfully
         if r.status_code != 200:
             await update.message.reply_text("❌ API Server Error")
             return
 
+        # Try converting response into JSON
         try:
             data = r.json()
         except:
             await update.message.reply_text("❌ API returned invalid JSON")
             return
 
+        # Generate unique ID for this response
         uid = str(uuid.uuid4())
+
+        # Store result in cache so it can be downloaded later
         CACHE[uid] = data
 
-        # If request was Telegram lookup
+
+        # ================= FORMAT RESULT =================
+
+        # If the request is Telegram lookup (/tg)
         if api_url == TG_API:
             preview = format_tg_result(data)
 
-        # Other APIs use normal formatter
+        # If UI formatting mode is enabled
         elif RESULT_MODE == "ui":
             preview = format_result(data)
 
-        # Default = raw JSON
+        # Otherwise return raw JSON text
         else:
             preview = json.dumps(data, indent=2)[:3500]
 
-        # Create button list
+
+        # ================= CREATE BUTTONS =================
+
+        # Create empty button list
         buttons = []
 
-        # If Telegram lookup add open profile button
+        # If Telegram lookup add "Open Telegram" button
         if api_url == TG_API:
             number = data.get("number")
+
             if number:
                 buttons.append(
-                    [InlineKeyboardButton("👤 Open Telegram", url=f"tg://user?id={number}")]
+                    [InlineKeyboardButton(
+                        "👤 Open Telegram",
+                        url=f"tg://user?id={number}"
+                    )]
                 )
 
-        # JSON download button
+        # Add button to download full JSON result
         buttons.append(
-            [InlineKeyboardButton("📄 Full JSON", callback_data=f"json_{uid}")]
+            [InlineKeyboardButton(
+                "📄 Full JSON",
+                callback_data=f"json_{uid}"
+            )]
         )
 
+        # Convert button list to Telegram keyboard
         keyboard = InlineKeyboardMarkup(buttons)
-        # Create button list
-buttons = []
 
-        # If Telegram lookup add open profile button
-       if api_url == TG_API:
-           number = data.get("number")
-           if number:
-               buttons.append(
-                   [InlineKeyboardButton("👤 Open Telegram", url=f"tg://user?id={number}")]
-               )
 
-       # JSON download button
-       buttons.append(
-           [InlineKeyboardButton("📄 Full JSON", callback_data=f"json_{uid}")]
-       )
+        # ================= SEND RESULT =================
 
-       keyboard = InlineKeyboardMarkup(buttons)
-
+        # Escape preview text for HTML safety
         safe_preview = html.escape(preview)
 
+        # Send formatted result inside copyable box
         await update.message.reply_text(
             f"🔎 <b>Search Result</b>\n\n<pre>{safe_preview}</pre>",
             parse_mode="HTML",
             reply_markup=keyboard
         )
 
+
+    # ================= ERROR HANDLING =================
     except Exception as e:
         await update.message.reply_text(f"API Error: {e}")
         
