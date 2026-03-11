@@ -515,7 +515,7 @@ def format_tg_result(data, target_id):
 
 🤖 Telegram Info
 🆔 User ID: {target_id}
-👤 Username: @{username}
+👤 Username: {username_text}
 """
 
     return text
@@ -610,7 +610,7 @@ Owner: {OWNER_USERNAME}
             if username:
                url = f"https://t.me/{username}"
             else:
-                url = f"tg://user?id={value}"
+                url = f"https://t.me/{value}""
 
             buttons.append(
                 [InlineKeyboardButton("👤 Open Telegram", url=url)]
