@@ -576,7 +576,7 @@ Owner: {OWNER_USERNAME}
 
         # If the request is Telegram lookup (/tg)
         if api_url == TG_API:
-            preview = format_tg_result(data)
+            preview = format_tg_result(data, value)
 
         # If UI formatting mode is enabled
         elif RESULT_MODE == "ui":
