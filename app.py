@@ -619,14 +619,15 @@ Owner: {OWNER_USERNAME}
         keyboard = InlineKeyboardMarkup(buttons)
 
 
-        # ================= SEND RESULT =================
+    # ================= SEND RESULT =================
 
-    # Escape preview text for HTML safety
-       
-safe_preview = html.escape(preview)
+        # Escape preview text for HTML safety
+        safe_preview = html.escape(preview)
 
+        # Dynamic title
         title = "🔎 Telegram Lookup" if api_url == TG_API else "🔎 Search Result"
 
+        # Send result
         await update.message.reply_text(
             f"{title}\n\n<pre>{safe_preview}</pre>",
             parse_mode="HTML",
