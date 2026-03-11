@@ -486,6 +486,12 @@ def format_tg_result(data, target_id):
     country = data.get("country", "N/A")
     code = data.get("country_code", "N/A")
     number = data.get("number", "N/A")
+    username = data.get("username")
+
+    if username:
+        username_text = f"@{username}"
+    else:
+        username_text = "N/A"
     
     # Extract time data
     time_data = data.get("time_swap", {})
@@ -609,7 +615,7 @@ Owner: {OWNER_USERNAME}
             buttons.append(
                 [InlineKeyboardButton("👤 Open Telegram", url=url)]
             )
-                )
+                
         # Add button to download full JSON result
         buttons.append(
             [InlineKeyboardButton(
