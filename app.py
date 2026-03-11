@@ -625,11 +625,11 @@ Owner: {OWNER_USERNAME}
         safe_preview = html.escape(preview)
 
         # Send formatted result inside copyable box
-        await update.message.reply_text(
-            f"🔎 <b>Search Result</b>\n\n<pre>{safe_preview}</pre>",
-            parse_mode="HTML",
-            reply_markup=keyboard
-        )
+    
+title = "🔎 Telegram Lookup" if api_url == TG_API else "🔎 Search Result"
+
+await update.message.reply_text(
+    f"{title}\n\n<pre>{safe_preview}</pre>",
 
 # ================= ERROR HANDLING =================
 
