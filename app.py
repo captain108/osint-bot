@@ -508,7 +508,7 @@ def format_tg_result(data, target_id):
 ━━━━━━━━━━━━━━
 
 🤖 Telegram Info
-🆔 Chat ID: {target_id}
+🆔 User ID: {target_id}
 """
 
     return text
