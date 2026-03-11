@@ -800,6 +800,7 @@ async def premium_watcher(application):
 # ================= START BACKGROUND =================
 
 async def start_background(application):
+    await app.bot.delete_webhook(drop_pending_updates=True)
     asyncio.create_task(premium_watcher(application))
 
 # ================= MAIN =================
@@ -833,7 +834,7 @@ def main():
 
     print(f"{BOT_NAME} Running")
 
-    app.run_polling()
+    app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
     main()
