@@ -474,7 +474,7 @@ N/A
         alt = item.get("alternative_mobile") or "N/A"
         circle = item.get("circle/sim", "N/A")
         address = item.get("address") or "N/A"
-        address_clean = address.replace("!", ", ").replace("\n", " ").replace("  ", " ")
+        address_clean = address.replace("!", ", ").strip()
         aadhar = item.get("aadhar_number") or "N/A"
         email = item.get("email") or "N/A"
         
