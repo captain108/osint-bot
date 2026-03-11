@@ -486,7 +486,7 @@ def format_tg_result(data, target_id):
     country = data.get("country", "N/A")
     code = data.get("country_code", "N/A")
     number = data.get("number", "N/A")
-
+    
     # Extract time data
     time_data = data.get("time_swap", {})
 
@@ -509,6 +509,7 @@ def format_tg_result(data, target_id):
 
 🤖 Telegram Info
 🆔 User ID: {target_id}
+👤 Username: @{username}
 """
 
     return text
@@ -551,7 +552,7 @@ Owner: {OWNER_USERNAME}
     try:
 
         # Send request to API with the provided value
-        r = requests.get(api_url.format(value), timeout=15)
+        r = requests.get(api_url.format(value.strip()), timeout=15)
 
         # Check if API responded successfully
         if r.status_code != 200:
@@ -597,15 +598,17 @@ Owner: {OWNER_USERNAME}
         if api_url == TG_API:
 
             # Some APIs may return username instead of number
+            
             username = data.get("username")
 
-            # Only create button if username exists
             if username:
-                buttons.append(
-                    [InlineKeyboardButton(
-                        "👤 Open Telegram",
-                        url=f"https://t.me/{username}"
-                    )]
+               url = f"https://t.me/{username}"
+            else:
+                url = f"tg://user?id={value}"
+
+            buttons.append(
+                [InlineKeyboardButton("👤 Open Telegram", url=url)]
+            )
                 )
         # Add button to download full JSON result
         buttons.append(
