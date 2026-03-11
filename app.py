@@ -468,6 +468,8 @@ N/A
         address = item.get("address", "N/A").replace("!", "\n")
         aadhar = item.get("aadhar_number", "N/A")
         email = item.get("email", "N/A")
+        # Clean address formatting
+        address_clean = address.replace("!", ", ").replace("\n", " ").replace("  ", " ")
 
         text += f"""
 👤 Name: {name}
@@ -478,8 +480,7 @@ N/A
 
 📡 Circle/SIM: {circle}
 
-🏠 Address:
-{address}
+🏠 Address:{address_clean}
 
 🆔 Aadhaar: {aadhar}
 📧 Email: {email}
