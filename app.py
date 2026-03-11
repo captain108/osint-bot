@@ -800,7 +800,7 @@ async def premium_watcher(application):
 # ================= START BACKGROUND =================
 
 async def start_background(application):
-    await app.bot.delete_webhook(drop_pending_updates=True)
+    await application.bot.delete_webhook(drop_pending_updates=True)
     asyncio.create_task(premium_watcher(application))
 
 # ================= MAIN =================
