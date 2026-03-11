@@ -472,7 +472,7 @@ def format_result(data):
 
 # ================= TELEGRAM RESULT FORMATTER =================
 
-def format_tg_result(data):
+def format_tg_result(data, target_id):
 
     # If API response is not a dictionary
     if not isinstance(data, dict):
@@ -508,7 +508,7 @@ def format_tg_result(data):
 ━━━━━━━━━━━━━━
 
 🤖 Telegram Info
-🆔 Chat ID: {user_id}
+🆔 Chat ID: {target_id}
 """
 
     return text
