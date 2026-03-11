@@ -596,21 +596,17 @@ Owner: {OWNER_USERNAME}
 
         # ================= CREATE BUTTONS =================
 
-         # Create empty button list
         buttons = []
 
-        # If Telegram lookup add "Open Telegram" button
-        # If Telegram lookup add open profile button
+        # Telegram profile button
         if api_url == TG_API:
 
-            # Some APIs may return username instead of number
-            
             username = data.get("username")
 
             if username:
-               url = f"https://t.me/{username}"
+                url = f"https://t.me/{username}"
             else:
-               url = f"https://t.me/user?id={value}"
+                url = f"https://t.me/user?id={value}"
 
             buttons.append(
                 [InlineKeyboardButton("👤 Open Telegram", url=url)]
@@ -626,20 +622,31 @@ Owner: {OWNER_USERNAME}
 
         keyboard = InlineKeyboardMarkup(buttons)
 
-    # ================= SEND RESULT =================
 
-        # Escape preview text for HTML safety
+        # ================= SEND RESULT =================
+
         safe_preview = html.escape(preview)
-
-        # Dynamic title
         title = "🔎 Telegram Lookup" if api_url == TG_API else "🔎 Search Result"
 
-        # Send result message
-        await update.message.reply_text(
-            f"{title}\n\n<pre>{safe_preview}</pre>",
-            parse_mode="HTML",
-            reply_markup=keyboard
-        )
+        try:
+            await update.message.reply_text(
+                f"{title}\n\n<pre>{safe_preview}</pre>",
+                parse_mode="HTML",
+                reply_markup=keyboard
+            )
+
+        except Exception as e:
+
+            if "Button_user_invalid" in str(e):
+
+                # resend without button
+                await update.message.reply_text(
+                    f"{title}\n\n<pre>{safe_preview}</pre>",
+                    parse_mode="HTML"
+                )
+
+            else:
+                raise e
 
     # ================= ERROR HANDLING =================
 
