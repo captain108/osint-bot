@@ -610,7 +610,7 @@ Owner: {OWNER_USERNAME}
             if username:
                url = f"https://t.me/{username}"
             else:
-                url = f"https://t.me/{value}"
+               url = f"tg://user?id={value}"
 
             buttons.append(
                 [InlineKeyboardButton("👤 Open Telegram", url=url)]
