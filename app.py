@@ -558,8 +558,8 @@ Owner: {OWNER_USERNAME}
     try:
 
         # Send request to API with the provided value
-        r = requests.get(api_url.format(value.strip()), timeout=15)
-
+        url = api_url.format(value.strip()) if "{}" in api_url else f"{api_url}{value.strip()}"
+        r = requests.get(url, timeout=15)
         # Check if API responded successfully
         if r.status_code != 200:
             await update.message.reply_text("❌ API Server Error")
@@ -596,27 +596,22 @@ Owner: {OWNER_USERNAME}
 
         # ================= CREATE BUTTONS =================
 
-        # Create empty button list
         buttons = []
 
-        # If Telegram lookup add "Open Telegram" button
-        # If Telegram lookup add open profile button
+        # Telegram profile button (only if username exists)
         if api_url == TG_API:
 
-            # Some APIs may return username instead of number
-            
             username = data.get("username")
 
             if username:
-               url = f"https://t.me/{username}"
-            else:
-               url = f"tg://user?id={value}"
+                buttons.append(
+                    [InlineKeyboardButton(
+                        "👤 Open Telegram",
+                        url=f"https://t.me/{username}"
+                    )]
+                )
 
-            buttons.append(
-                [InlineKeyboardButton("👤 Open Telegram", url=url)]
-            )
-                
-        # Add button to download full JSON result
+        # JSON download button
         buttons.append(
             [InlineKeyboardButton(
                 "📄 Full JSON",
@@ -624,9 +619,7 @@ Owner: {OWNER_USERNAME}
             )]
         )
 
-        # Convert button list to Telegram keyboard
         keyboard = InlineKeyboardMarkup(buttons)
-
 
     # ================= SEND RESULT =================
 
