@@ -596,20 +596,25 @@ Owner: {OWNER_USERNAME}
 
         # ================= CREATE BUTTONS =================
 
+         # Create empty button list
         buttons = []
 
-        # Telegram profile button (only if username exists)
+        # If Telegram lookup add "Open Telegram" button
+        # If Telegram lookup add open profile button
         if api_url == TG_API:
 
+            # Some APIs may return username instead of number
+            
             username = data.get("username")
 
             if username:
-                buttons.append(
-                    [InlineKeyboardButton(
-                        "👤 Open Telegram",
-                        url=f"https://t.me/{username}"
-                    )]
-                )
+               url = f"https://t.me/{username}"
+            else:
+               url = f"https://t.me/user?id={value}"
+
+            buttons.append(
+                [InlineKeyboardButton("👤 Open Telegram", url=url)]
+            )
 
         # JSON download button
         buttons.append(
