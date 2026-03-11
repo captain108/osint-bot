@@ -429,7 +429,15 @@ Owner: {OWNER_USERNAME}
 def format_result(data):
 
     if not isinstance(data, dict):
-        return str(data)
+        return "❌ Invalid API response"
+
+    # Case 1: API says success but no record
+    if "no matching records" in str(data.get("message","")).lower():
+        return "❌ No data found."
+
+    # Case 2: API returns success false
+    if data.get("success") is False:
+        return "❌ No data found."
 
     results = data.get("result") or []
 
@@ -463,14 +471,13 @@ N/A
         name = item.get("name", "N/A")
         father = item.get("father_name", "N/A")
         mobile = item.get("mobile", "N/A")
-        alt = item.get("alternative_mobile", "N/A")
+        alt = item.get("alternative_mobile") or "N/A"
         circle = item.get("circle/sim", "N/A")
-        address = item.get("address", "N/A").replace("!", "\n")
-        aadhar = item.get("aadhar_number", "N/A")
-        email = item.get("email", "N/A")
-        # Clean address formatting
+        address = item.get("address") or "N/A"
         address_clean = address.replace("!", ", ").replace("\n", " ").replace("  ", " ")
-
+        aadhar = item.get("aadhar_number") or "N/A"
+        email = item.get("email") or "N/A"
+        
         text += f"""
 👤 Name: {name}
 👨 Father: {father}
