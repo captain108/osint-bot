@@ -601,6 +601,13 @@ Owner: {OWNER_USERNAME}
             await update.message.reply_text("❌ API returned invalid JSON")
             return
 
+        # -------- HANDLE NO DATA FROM API --------
+        if data.get("success") is False:
+            await update.message.reply_text(
+                f"🔎 Search Result\n\n❌ No data found."
+            )
+            return
+
         # Generate unique ID for this response
         uid = str(uuid.uuid4())
 
