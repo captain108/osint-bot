@@ -431,42 +431,63 @@ def format_result(data):
     if not isinstance(data, dict):
         return str(data)
 
-    if "data" not in data:
-        return json.dumps(data, indent=2)
-
-    results = data.get("data", [])
+    results = data.get("result") or []
 
     if not results:
-        return "❌ No results found."
 
-    text = "🔎 Search Result\n\n"
+        return """
+🔎 Number Lookup Result
+
+👤 Name: N/A
+👨 Father: N/A
+
+📱 Mobile: N/A
+📞 Alt Mobile: N/A
+
+📡 Circle/SIM: N/A
+
+🏠 Address:
+N/A
+
+🆔 Aadhaar: N/A
+📧 Email: N/A
+
+━━━━━━━━━━━━━━
+🔎 Data Source: @captainpapaj1
+"""
+
+    text = "🔎 Number Lookup Result\n\n"
 
     for item in results[:5]:
 
         name = item.get("name", "N/A")
         father = item.get("father_name", "N/A")
         mobile = item.get("mobile", "N/A")
-        alt = item.get("alt_mobile", "N/A")
-        circle = item.get("circle", "N/A")
-        address = item.get("address", "N/A")
+        alt = item.get("alternative_mobile", "N/A")
+        circle = item.get("circle/sim", "N/A")
+        address = item.get("address", "N/A").replace("!", "\n")
+        aadhar = item.get("aadhar_number", "N/A")
         email = item.get("email", "N/A")
-        idn = item.get("id_number", "N/A")
 
         text += f"""
 👤 Name: {name}
 👨 Father: {father}
+
 📱 Mobile: {mobile}
-📞 Alt: {alt}
-📍 Circle: {circle}
+📞 Alt Mobile: {alt}
+
+📡 Circle/SIM: {circle}
 
 🏠 Address:
 {address}
 
-🆔 ID: {idn}
+🆔 Aadhaar: {aadhar}
 📧 Email: {email}
 
 ━━━━━━━━━━━━━━
 """
+
+    text += "\n🔎 Data Source: @captainpapaj1"
 
     return text[:4000]
 
