@@ -627,24 +627,25 @@ Owner: {OWNER_USERNAME}
         # Dynamic title
         title = "🔎 Telegram Lookup" if api_url == TG_API else "🔎 Search Result"
 
-        # Send result
+        # Send result message
         await update.message.reply_text(
             f"{title}\n\n<pre>{safe_preview}</pre>",
             parse_mode="HTML",
             reply_markup=keyboard
         )
 
-   # ================= ERROR HANDLING =================
+    # ================= ERROR HANDLING =================
 
-except requests.exceptions.Timeout:
+    except requests.exceptions.Timeout:
         await update.message.reply_text(
             "⚠️ API server is waking up. Try again in a few seconds."
         )
 
     except Exception as e:
-        await update.message.reply_text("❌ API Error occurred.")
+        await update.message.reply_text(
+            f"❌ API Error: {e}"
+        )
 
-    
         
 # ================= VALUE HELPER =================
 
