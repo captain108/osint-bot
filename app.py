@@ -602,9 +602,13 @@ Owner: {OWNER_USERNAME}
             return
 
         # -------- HANDLE NO DATA FROM API --------
-        if data.get("success") is False:
+        if (
+            data.get("success") is False
+            or "no matching records" in str(data.get("message","")).lower()
+            or "no data" in str(data.get("error","")).lower()
+        ):
             await update.message.reply_text(
-                f"🔎 Search Result\n\n❌ No data found."
+                "🔎 Search Result\n\n❌ No data found."
             )
             return
 
