@@ -631,14 +631,16 @@ Owner: {OWNER_USERNAME}
             reply_markup=keyboard
         )
 
+# ================= ERROR HANDLING =================
 
-    # ================= ERROR HANDLING =================
-   
-except requests.exceptions.Timeout:
-    await update.message.reply_text("⚠️ API server is waking up. Try again in a few seconds.")
+    except requests.exceptions.Timeout:
+        await update.message.reply_text(
+            "⚠️ API server is waking up. Try again in a few seconds."
+        )
 
-except Exception as e:
-    await update.message.reply_text("❌ API Error occurred.")
+    except Exception as e:
+        await update.message.reply_text("❌ API Error occurred.")
+    
         
 # ================= VALUE HELPER =================
 
