@@ -508,7 +508,7 @@ def format_tg_result(data):
 ━━━━━━━━━━━━━━
 
 🤖 Telegram Info
-🆔 Chat ID: {number}
+🆔 Chat ID: {user_id}
 """
 
     return text
@@ -633,8 +633,12 @@ Owner: {OWNER_USERNAME}
 
 
     # ================= ERROR HANDLING =================
-    except Exception as e:
-        await update.message.reply_text(f"API Error: {e}")
+   
+except requests.exceptions.Timeout:
+    await update.message.reply_text("⚠️ API server is waking up. Try again in a few seconds.")
+
+except Exception as e:
+    await update.message.reply_text("❌ API Error occurred.")
         
 # ================= VALUE HELPER =================
 
