@@ -591,7 +591,7 @@ Owner: {OWNER_USERNAME}
         r = requests.get(url, timeout=15)
         # Check if API responded successfully
         if r.status_code != 200:
-            await update.message.reply_text("❌ API Server Error")
+            await update.message.reply_text("❌ No data found.")
             return
 
         # Try converting response into JSON
