@@ -606,7 +606,7 @@ Owner: {OWNER_USERNAME}
             if username:
                 url = f"https://t.me/{username}"
             else:
-                url = f"https://t.me/user?id={value}"
+                url = f"tg://user?id={value}"
 
             buttons.append(
                 [InlineKeyboardButton("👤 Open Telegram", url=url)]
@@ -637,26 +637,26 @@ Owner: {OWNER_USERNAME}
 
         except Exception as e:
 
-    if "Button_user_invalid" in str(e):
+            if "Button_user_invalid" in str(e):
 
-        # remove Telegram button but keep JSON button
-        buttons = [
-            [InlineKeyboardButton(
-                "📄 Full JSON",
-                callback_data=f"json_{uid}"
-            )]
-        ]
+                # remove Telegram button but keep JSON button
+                buttons = [
+                    [InlineKeyboardButton(
+                        "📄 Full JSON",
+                        callback_data=f"json_{uid}"
+                  )]
+                ]
 
-        keyboard = InlineKeyboardMarkup(buttons)
+                keyboard = InlineKeyboardMarkup(buttons)
 
-        await update.message.reply_text(
-            f"{title}\n\n<pre>{safe_preview}</pre>",
-            parse_mode="HTML",
-            reply_markup=keyboard
-        )
+                await update.message.reply_text(
+                    f"{title}\n\n<pre>{safe_preview}</pre>",
+                    parse_mode="HTML",
+                    reply_markup=keyboard
+                )
 
-    else:
-        raise e
+            else:
+                raise e
 
     # ================= ERROR HANDLING =================
 
