@@ -630,6 +630,9 @@ title = "🔎 Telegram Lookup" if api_url == TG_API else "🔎 Search Result"
 
 await update.message.reply_text(
     f"{title}\n\n<pre>{safe_preview}</pre>",
+    parse_mode="HTML",
+    reply_markup=keyboard
+)
 
 # ================= ERROR HANDLING =================
 
