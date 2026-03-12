@@ -718,7 +718,7 @@ Owner: {OWNER_USERNAME}
 
         except Exception as e:
 
-            if "Button_user_invalid" in str(e):
+            if "Button_user_invalid" in str(e) or "Button_user_privacy_restricted" in str(e):
 
                 # remove Telegram button but keep JSON button
                 buttons = [
