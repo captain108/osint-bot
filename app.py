@@ -474,7 +474,7 @@ N/A
         alt = item.get("alternative_mobile") or "N/A"
         circle = item.get("circle/sim", "N/A")
         address = item.get("address") or "N/A"
-        address_clean = address.replace("!", ", ").strip()
+        address_clean = address.replace("!", ", ").replace("  ", " ").strip()
         aadhar = item.get("aadhar_number") or "N/A"
         email = item.get("email") or "N/A"
         
@@ -635,10 +635,12 @@ Owner: {OWNER_USERNAME}
             return
 
         # -------- HANDLE NO DATA FROM API --------
+      
         if (
             data.get("success") is False
             or "no matching records" in str(data.get("message","")).lower()
             or "no data" in str(data.get("error","")).lower()
+            or data.get("result") == []
         ):
             await update.message.reply_text(
                 "🔎 Search Result\n\n❌ No data found."
@@ -666,7 +668,7 @@ Owner: {OWNER_USERNAME}
             preview = format_result(data)
 
         else:
-            preview = json.dumps(data, indent=2)[:3500]
+            preview = json.dumps(data, indent=2)
 
 
         # ================= CREATE BUTTONS =================
