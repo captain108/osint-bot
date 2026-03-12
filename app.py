@@ -493,6 +493,7 @@ N/A
 📧 Email: {email}
 
 ━━━━━━━━━━━━━━
+🔎 Data Source: @captainpapaj1
 """
 
     text += "\n🔎 Data Source: @captainpapaj1"
@@ -545,6 +546,9 @@ def format_tg_result(data, target_id):
 🤖 Telegram Info
 🆔 User ID: {target_id}
 👤 Username: {username_text}
+
+━━━━━━━━━━━━━━
+🔎 Data Source: @captainpapaj1
 """
 
     return text
