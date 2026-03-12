@@ -549,6 +549,39 @@ def format_tg_result(data, target_id):
 
     return text
 
+# ================= VEHICLE RESULT FORMATTER =================
+
+def format_vehicle_result(data):
+
+    if not isinstance(data, dict):
+        return "❌ Invalid API response"
+
+    if data.get("status") != "success":
+        return "❌ No vehicle data found."
+
+    info = data.get("data", {})
+
+    number = data.get("vehicle_number", "N/A")
+    rto = info.get("rto_code", "N/A")
+    address = info.get("address", "N/A")
+    state = info.get("state", "N/A")
+    phone = info.get("phone", "N/A")
+
+    return f"""
+🚗 Vehicle Lookup Result
+
+🔢 Vehicle Number: {number}
+
+🏢 RTO Code: {rto}
+📍 Address: {address}
+🌎 State: {state}
+
+☎️ RTO Phone: {phone}
+
+━━━━━━━━━━━━━━
+🔎 Data Source: @captainpapaj1
+"""
+
 # ================= API CALL =================
 
 async def call_api(update, api_url, value):
@@ -583,7 +616,7 @@ Owner: {OWNER_USERNAME}
             )
             return
 
-    # =================  API REQUEST  =================
+    # ---------  API REQUEST  ----------
     try:
 
         # Send request to API with the provided value
@@ -622,14 +655,16 @@ Owner: {OWNER_USERNAME}
         # ================= FORMAT RESULT =================
 
         # If the request is Telegram lookup (/tg)
+       
         if api_url == TG_API:
             preview = format_tg_result(data, value)
 
-        # If UI formatting mode is enabled
+        elif api_url == VEH_API and RESULT_MODE == "ui":
+            preview = format_vehicle_result(data)
+
         elif RESULT_MODE == "ui":
             preview = format_result(data)
 
-        # Otherwise return raw JSON text
         else:
             preview = json.dumps(data, indent=2)[:3500]
 
