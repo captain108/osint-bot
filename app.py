@@ -493,7 +493,6 @@ N/A
 📧 Email: {email}
 
 ━━━━━━━━━━━━━━
-🔎 Data Source: @captainpapaj1
 """
 
     text += "\n🔎 Data Source: @captainpapaj1"
@@ -555,7 +554,7 @@ def format_tg_result(data, target_id):
 
 # ================= VEHICLE RESULT FORMATTER =================
 
-def format_vehicle_result(data, value):
+def format_vehicle_result(data, searched_number):
 
     if not isinstance(data, dict):
         return "❌ Invalid API response"
@@ -565,7 +564,7 @@ def format_vehicle_result(data, value):
 
     info = data.get("data", {})
 
-    number = data.get("vehicle_number") or value
+    number = data.get("vehicle_number") or searched_number
     rto = info.get("rto_code", "N/A")
     address = info.get("address", "N/A")
     state = info.get("state", "N/A")
@@ -666,7 +665,7 @@ Owner: {OWNER_USERNAME}
             preview = format_tg_result(data, value)
 
         elif api_url == VEH_API and RESULT_MODE == "ui":
-            preview = format_vehicle_result(data)
+            preview = format_vehicle_result(data, value)
 
         elif RESULT_MODE == "ui":
             preview = format_result(data)
