@@ -555,7 +555,7 @@ def format_tg_result(data, target_id):
 
 # ================= VEHICLE RESULT FORMATTER =================
 
-def format_vehicle_result(data, searched_number):
+def format_vehicle_result(data, value):
 
     if not isinstance(data, dict):
         return "❌ Invalid API response"
@@ -565,7 +565,7 @@ def format_vehicle_result(data, searched_number):
 
     info = data.get("data", {})
 
-    number = data.get("vehicle_number") or searched_number
+    number = data.get("vehicle_number") or value
     rto = info.get("rto_code", "N/A")
     address = info.get("address", "N/A")
     state = info.get("state", "N/A")
