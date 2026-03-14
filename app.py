@@ -416,20 +416,10 @@ def format_result(data):
     if not isinstance(data, dict):
         return "❌ Invalid API response"
 
-    # Case 1: API says success but no record
-    if "no matching records" in str(data.get("message","")).lower():
-        return "❌ No data found."
-
-    # Case 2: API returns success false
-    if data.get("success") is False:
-        return "❌ No data found."
-
-    results = data.get("result") or []
+    results = data.get("results") or data.get("result") or []
 
     if not results:
-
-        return """
-🔎 Number Lookup Result
+        return """🔎 Number Lookup Result
 
 👤 Name: N/A
 👨 Father: N/A
@@ -442,7 +432,7 @@ def format_result(data):
 🏠 Address:
 N/A
 
-🆔 Aadhaar: N/A
+🆔 ID: N/A
 📧 Email: N/A
 
 ━━━━━━━━━━━━━━
@@ -453,22 +443,18 @@ N/A
 
     for i, item in enumerate(results[:5], start=1):
 
-    name = item.get("name") or "N/A"
-    father = item.get("father_name") or "N/A"
-    mobile = item.get("mobile") or "N/A"
-    alt = item.get("alt_mobile") or "N/A"
-    circle = item.get("circle") or "N/A"
-    address = item.get("address") or "N/A"
-    id_num = item.get("id_number") or "N/A"
-    email = item.get("email") or "N/A"
-    tc = item.get("truecaller_name") or "N/A"
+        name = item.get("name") or "N/A"
+        father = item.get("father_name") or "N/A"
+        mobile = item.get("mobile") or "N/A"
+        alt = item.get("alt_mobile") or "N/A"
+        circle = item.get("circle") or item.get("circle/sim") or "N/A"
+        address = item.get("address") or "N/A"
+        id_num = item.get("id_number") or item.get("id number") or "N/A"
+        email = item.get("email") or "N/A"
+        tc = item.get("truecaller_name") or "N/A"
 
-    text += f"""
-   📄 Result #{i}
+        text += f"""📄 Result #{i}
 
-   👤 Name: {name}
-   ...
-   """
 👤 Name: {name}
 👨 Father: {father}
 
@@ -486,9 +472,10 @@ N/A
 🔎 Truecaller: {tc}
 
 ━━━━━━━━━━━━━━
+
 """
 
-    text += "\n🔎 Data Source: @captainpapaj1"
+    text += "🔎 Data Source: @captainpapaj1"
 
     return text[:4000]
 
