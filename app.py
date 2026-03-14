@@ -471,7 +471,7 @@ N/A
         name = item.get("name", "N/A")
         father = item.get("father name", "N/A")
         mobile = item.get("mobile", "N/A")
-        alt = item.get("alternative_mobile") or "N/A"
+        alt = item.get("alternative mobile") or "N/A"
         circle = item.get("circle/sim", "N/A")
         address = item.get("address") or "N/A"
         address_clean = address.replace("!", ", ").replace("  ", " ").strip()
