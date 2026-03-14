@@ -35,6 +35,7 @@ GC_FILE = "approved_gc.json"
 GROUPS_FILE = "groups.json"
 
 CACHE = {}
+CACHE_TTL = 3600
 
 # ================= FILE UTILS =================
 
