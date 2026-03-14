@@ -687,17 +687,14 @@ async def call_api(update, api_url, value):
     # ---- LIMIT CHECK ----
     limit_needed = True
 
-    # Premium users -> no limit
     if is_premium(user_id):
         limit_needed = False
 
-    # Approved groups -> no limit
     if chat.type in ["group", "supergroup"]:
         groups = load_gc()
         if chat.id in groups:
             limit_needed = False
 
-    # Apply daily limit only if needed
     if limit_needed:
         if not check_daily_limit(user_id):
             await update.message.reply_text(
@@ -711,41 +708,38 @@ Owner: {OWNER_USERNAME}
             )
             return
 
+    # ================= CACHE CHECK =================
 
-# ================= CACHE CHECK =================
+    cache_key = f"{api_url}_{value}"
 
-cache_key = f"{api_url}_{value}"
+    if cache_key in CACHE:
 
-if cache_key in CACHE:
+        cached = CACHE[cache_key]
 
-    cached = CACHE[cache_key]
+        if time.time() - cached["time"] < CACHE_TTL:
 
-    # check if cache expired
-    if time.time() - cached["time"] < CACHE_TTL:
+            data = cached["data"]
 
-        data = cached["data"]
+            if api_url == TG_API:
+                preview = format_tg_result(data, value)
 
-        # use cached result
-        if api_url == TG_API:
-            preview = format_tg_result(data, value)
+            elif api_url == VEH_API and RESULT_MODE == "ui":
+                preview = format_vehicle_result(data, value)
 
-        elif api_url == VEH_API and RESULT_MODE == "ui":
-            preview = format_vehicle_result(data, value)
+            elif RESULT_MODE == "ui":
+                preview = format_result(data)
 
-        elif RESULT_MODE == "ui":
-            preview = format_result(data)
+            else:
+                preview = json.dumps(data, indent=2)
 
-        else:
-            preview = json.dumps(data, indent=2)
+            safe_preview = html.escape(preview)
 
-        safe_preview = html.escape(preview)
+            await update.message.reply_text(
+                f"🔎 Search Result\n\n<pre>{safe_preview}</pre>",
+                parse_mode="HTML"
+            )
 
-        await update.message.reply_text(
-            f"🔎 Search Result\n\n<pre>{safe_preview}</pre>",
-            parse_mode="HTML"
-        )
-
-        return
+            return
     
     # ---------  API REQUEST  ----------
     try:
