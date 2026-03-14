@@ -476,7 +476,7 @@ N/A
         address = item.get("address") or "N/A"
         address_clean = address.replace("!", ", ").replace("  ", " ").strip()
         aadhar = item.get("aadhar_number") or "N/A"
-        email = item.get("mail") or "N/A"
+        email = item.get("email") or "N/A"
         id = item.get("id number") or "N/A"
         
         text += f"""
@@ -509,11 +509,11 @@ def format_tg_result(data, target_id):
         return "❌ Invalid API response"
 
     # If API returned status false
-    if not data.get("status"):
+    if not data.get("success"):
         return "❌ No result found."
 
     # Extract fields safely
-    country = data.get("country_code", "N/A")
+    country = data.get("country", "N/A")
     code = data.get("country_code", "N/A")
     number = data.get("number", "N/A")
     username = data.get("username")
