@@ -451,20 +451,24 @@ N/A
 
     text = "🔎 Number Lookup Result\n\n"
 
-    for item in results[:5]:
+    for i, item in enumerate(results[:5], start=1):
 
-        name = item.get("name", "N/A")
-        father = item.get("father_name", "N/A")
-        mobile = item.get("mobile", "N/A")
-        alt = item.get("alternative_mobile") or "N/A"
-        circle = item.get("circle/sim", "N/A")
-        address = item.get("address") or "N/A"
-        address_clean = ", ".join([x for x in address.split("!") if x.strip()])
-        aadhar = item.get("aadhar_number") or "N/A"
-        email = item.get("email") or "N/A"
-        id = item.get("id number") or "N/A"
-        
-        text += f"""
+    name = item.get("name") or "N/A"
+    father = item.get("father_name") or "N/A"
+    mobile = item.get("mobile") or "N/A"
+    alt = item.get("alt_mobile") or "N/A"
+    circle = item.get("circle") or "N/A"
+    address = item.get("address") or "N/A"
+    id_num = item.get("id_number") or "N/A"
+    email = item.get("email") or "N/A"
+    tc = item.get("truecaller_name") or "N/A"
+
+    text += f"""
+   📄 Result #{i}
+
+   👤 Name: {name}
+   ...
+   """
 👤 Name: {name}
 👨 Father: {father}
 
@@ -473,11 +477,14 @@ N/A
 
 📡 Circle/SIM: {circle}
 
-🏠 Address:{address_clean}
+🏠 Address:
+{address}
 
-🆔 Aadhaar: {aadhar}
+🆔 ID: {id_num}
 📧 Email: {email}
-🈳 id: {id}
+
+🔎 Truecaller: {tc}
+
 ━━━━━━━━━━━━━━
 """
 
