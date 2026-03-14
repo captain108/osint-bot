@@ -547,7 +547,7 @@ def format_vehicle_result(data, searched_number):
     owner_name = data.get("owner_name", "N/A")
     model_number = data.get("model_number", "N/A")
     city = data.get("city", "N/A")
-    father_name = data.get("fathe_name, "N/A")
+    father_name = data.get("father_name, "N/A")
     rto = data.get("rto", "N/A")
     maker_model = data.get("maker_model", "N/A")
     vehicle_class = data.get("vehicle_class, "N/A")
