@@ -425,6 +425,25 @@ Owner: {OWNER_USERNAME}
 """
     )
 
+# ================= CACHE STATS =================
+
+async def cachestats(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    total_cache = len(CACHE)
+
+    await update.message.reply_text(
+f"""
+⚡ Cache Statistics
+
+Total Cache Entries: {total_cache}
+
+Cache TTL: {CACHE_TTL} seconds
+"""
+    )
+
 # ================= RESULT FORMATTER =================
 
 def format_result(data):
@@ -634,6 +653,29 @@ def clean_api_credits(data):
             clean_api_credits(item)
 
     return data
+
+# ================= CACHE CLEANER =================
+
+async def cache_cleaner():
+
+    while True:
+
+        now = time.time()
+
+        remove_keys = []
+
+        for key, value in CACHE.items():
+
+            # only check search cache objects
+            if isinstance(value, dict) and "time" in value:
+
+                if now - value["time"] > CACHE_TTL:
+                    remove_keys.append(key)
+
+        for key in remove_keys:
+            del CACHE[key]
+
+        await asyncio.sleep(600)  # clean every 10 minutes
 
 # ================= API CALL =================
 
@@ -992,7 +1034,9 @@ async def premium_watcher(application):
 
 async def start_background(application):
     await application.bot.delete_webhook(drop_pending_updates=True)
+
     asyncio.create_task(premium_watcher(application))
+    asyncio.create_task(cache_cleaner())
 
 # ================= MAIN =================
 
@@ -1019,7 +1063,7 @@ def main():
     app.add_handler(CommandHandler("approvegc", approvegc))
     app.add_handler(CommandHandler("gclist", gclist))
     app.add_handler(CommandHandler("stats", stats))
-    
+    app.add_handler(CommandHandler("cache", cachestats))
 
     app.add_handler(CallbackQueryHandler(json_download, pattern="json_"))
 
