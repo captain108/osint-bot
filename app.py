@@ -476,7 +476,8 @@ N/A
         address = item.get("address") or "N/A"
         address_clean = address.replace("!", ", ").replace("  ", " ").strip()
         aadhar = item.get("aadhar_number") or "N/A"
-        email = item.get("email") or "N/A"
+        email = item.get("mail") or "N/A"
+        id = item.get("id number") or "N/A"
         
         text += f"""
 👤 Name: {name}
@@ -491,7 +492,7 @@ N/A
 
 🆔 Aadhaar: {aadhar}
 📧 Email: {email}
-
+🈳 id: {id}
 ━━━━━━━━━━━━━━
 """
 
