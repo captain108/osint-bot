@@ -590,15 +590,40 @@ def format_vehicle_result(data, searched_number):
 
 def clean_api_credits(data):
 
-    credit_keys = ["by", "owner", "api_by", "developer", "credit", "source", "Owner", "API BY"]
+    # keys to remove completely
+    remove_keys = [
+        "endpoint",
+        "example",
+        "api",
+        "api_url",
+        "url",
+        "developer",
+        "credit",
+        "source"
+    ]
+
+    # keys to replace with your username
+    replace_keys = [
+        "by",
+        "owner",
+        "api_by",
+        "Owner",
+        "API BY"
+    ]
 
     if isinstance(data, dict):
 
         for key in list(data.keys()):
 
-            if key in credit_keys:
+            # remove sensitive fields
+            if key in remove_keys:
+                del data[key]
+
+            # replace credits
+            elif key in replace_keys:
                 data[key] = OWNER_USERNAME
 
+            # recursive cleaning
             elif isinstance(data[key], (dict, list)):
                 clean_api_credits(data[key])
 
@@ -659,6 +684,8 @@ Owner: {OWNER_USERNAME}
             data = r.json()
 
             # remove original API credits
+            data = r.json()
+
             data = clean_api_credits(data)
         except:
             await update.message.reply_text("❌ API returned invalid JSON")
