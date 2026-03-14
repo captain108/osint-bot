@@ -113,12 +113,6 @@ def check_daily_limit(user_id):
 
 # ================= PREMIUM SYSTEM =================
 
-def load_premium():
-    return load_json(PREMIUM_FILE)
-
-def save_premium(data):
-    save_json(PREMIUM_FILE, data)
-
 def is_premium(user_id):
 
     data = premium_col.find_one({"user_id": user_id})
