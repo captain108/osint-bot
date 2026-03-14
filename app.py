@@ -469,12 +469,12 @@ N/A
     for item in results[:5]:
 
         name = item.get("name", "N/A")
-        father = item.get("father name", "N/A")
+        father = item.get("father_name", "N/A")
         mobile = item.get("mobile", "N/A")
-        alt = item.get("alternative mobile") or "N/A"
+        alt = item.get("alternative_mobile") or "N/A"
         circle = item.get("circle/sim", "N/A")
         address = item.get("address") or "N/A"
-        address_clean = address.replace("!", ", ").replace("  ", " ").strip()
+        address_clean = ", ".join([x for x in address.split("!") if x.strip()])
         aadhar = item.get("aadhar_number") or "N/A"
         email = item.get("email") or "N/A"
         id = item.get("id number") or "N/A"
@@ -560,7 +560,7 @@ def format_vehicle_result(data, searched_number):
     if not isinstance(data, dict):
         return "❌ Invalid API response"
 
-    if data.get("status") != "success":
+    if not data.get("success"):
         return "❌ No vehicle data found."
 
     info = data.get("data", {})
@@ -585,6 +585,29 @@ def format_vehicle_result(data, searched_number):
 ━━━━━━━━━━━━━━
 🔎 Data Source: @captainpapaj1
 """
+
+# ================= JSON CLEANER =================
+
+def clean_api_credits(data):
+
+    credit_keys = ["by", "owner", "api_by", "developer", "credit", "source", "Owner", "API BY"]
+
+    if isinstance(data, dict):
+
+        for key in list(data.keys()):
+
+            if key in credit_keys:
+                data[key] = OWNER_USERNAME
+
+            elif isinstance(data[key], (dict, list)):
+                clean_api_credits(data[key])
+
+    elif isinstance(data, list):
+
+        for item in data:
+            clean_api_credits(item)
+
+    return data
 
 # ================= API CALL =================
 
@@ -634,6 +657,9 @@ Owner: {OWNER_USERNAME}
         # Try converting response into JSON
         try:
             data = r.json()
+
+            # remove original API credits
+            data = clean_api_credits(data)
         except:
             await update.message.reply_text("❌ API returned invalid JSON")
             return
@@ -644,7 +670,7 @@ Owner: {OWNER_USERNAME}
             data.get("success") is False
             or "no matching records" in str(data.get("message","")).lower()
             or "no data" in str(data.get("error","")).lower()
-            or data.get("result") == []
+            or data.get("result") == [] or data.get("results") == []
         ):
             await update.message.reply_text(
                 "🔎 Search Result\n\n❌ No data found."
