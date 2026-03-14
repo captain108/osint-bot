@@ -836,20 +836,23 @@ Owner: {OWNER_USERNAME}
 
         # ================= FORMAT RESULT =================
 
-        # If the request is Telegram lookup (/tg)
-       
         if api_url == TG_API:
             preview = format_tg_result(data, value)
 
-        elif api_url == VEH_API and RESULT_MODE == "ui":
+        elif api_url == VEH_API:
             preview = format_vehicle_result(data, value)
 
-        elif RESULT_MODE == "ui":
+        elif api_url == UPI_API:
+            preview = format_upi_result(data)
+
+        elif api_url == FF_API:
+            preview = format_ff_result(data)
+
+        elif api_url == NUM_API:
             preview = format_result(data)
 
         else:
             preview = json.dumps(data, indent=2)
-
 
         # ================= CREATE BUTTONS =================
 
