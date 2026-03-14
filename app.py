@@ -669,6 +669,42 @@ Owner: {OWNER_USERNAME}
             )
             return
 
+
+# ================= CACHE CHECK =================
+
+cache_key = f"{api_url}_{value}"
+
+if cache_key in CACHE:
+
+    cached = CACHE[cache_key]
+
+    # check if cache expired
+    if time.time() - cached["time"] < CACHE_TTL:
+
+        data = cached["data"]
+
+        # use cached result
+        if api_url == TG_API:
+            preview = format_tg_result(data, value)
+
+        elif api_url == VEH_API and RESULT_MODE == "ui":
+            preview = format_vehicle_result(data, value)
+
+        elif RESULT_MODE == "ui":
+            preview = format_result(data)
+
+        else:
+            preview = json.dumps(data, indent=2)
+
+        safe_preview = html.escape(preview)
+
+        await update.message.reply_text(
+            f"🔎 Search Result\n\n<pre>{safe_preview}</pre>",
+            parse_mode="HTML"
+        )
+
+        return
+    
     # ---------  API REQUEST  ----------
     try:
 
@@ -709,6 +745,12 @@ Owner: {OWNER_USERNAME}
 
         # Store result in cache so it can be downloaded later
         CACHE[uid] = data
+
+        # save search cache
+        CACHE[f"{api_url}_{value}"] = {
+            "data": data,
+            "time": time.time()
+        }
 
 
         # ================= FORMAT RESULT =================
