@@ -544,6 +544,23 @@ def format_vehicle_result(data, searched_number):
 
     info = data.get("data", {})
 
+    owner_name = data.get("owner_name", "N/A")
+    model_number = data.get("model_number", "N/A")
+    city = data.get("city", "N/A")
+    father_name = data.get("fathe_name, "N/A")
+    rto = data.get("rto", "N/A")
+    maker_model = data.get("maker_model", "N/A")
+    vehicle_class = data.get("vehicle_class, "N/A")
+    fuel_type = data.get("fuel_type", "N/A")
+    fuel_norms = data.get("fuel_norms", "N/A")
+    chassis_no = data.get("chassis_no", "N/A")
+    engine_no = data.get("engine_no", "N/A")
+    insurance_company = data.get("insurance_company", "N/A")
+    reg_date = data.get("reg_date", "N/A")
+    vehicle_age = data.get("vehicle_age", "N/A")
+    fitness_upto = data.get("fitness_upto", "N/A")
+    tax_upto = data.get("tax_upto", "N/A")
+    insurance_expiry = ("insurance_expiry", "N/A")
     number = data.get("vehicle_number") or searched_number
     rto = info.get("rto_code", "N/A")
     address = info.get("address", "N/A")
@@ -553,9 +570,14 @@ def format_vehicle_result(data, searched_number):
     return f"""
 🚗 Vehicle Lookup Result
 
+📛 Owner Name: {owner_name}
+🎅 Father Name: {father_name}
 🔢 Vehicle Number: {number}
+🚘 Model Number: {model_number]
 
+🎾 Rto: {rto}
 🏢 RTO Code: {rto}
+🏙 City: {city}
 📍 Address: {address}
 🌎 State: {state}
 
