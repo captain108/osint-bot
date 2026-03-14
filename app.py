@@ -544,64 +544,68 @@ def format_vehicle_result(data, searched_number):
 
     info = data.get("data", {})
 
-    owner_name = data.get("owner_name", "N/A")
-    model_number = data.get("model_number", "N/A")
-    city = data.get("city", "N/A")
-    father_name = data.get("father_name", "N/A")
-    rto = data.get("rto", "N/A")
-    maker_model = data.get("maker_model", "N/A")
-    vehicle_class = data.get("vehicle_class", "N/A")
-    fuel_type = data.get("fuel_type", "N/A")
-    fuel_norms = data.get("fuel_norms", "N/A")
-    chassis_no = data.get("chassis_no", "N/A")
-    engine_no = data.get("engine_no", "N/A")
-    insurance_company = data.get("insurance_company", "N/A")
-    reg_date = data.get("reg_date", "N/A")
-    vehicle_age = data.get("vehicle_age", "N/A")
-    fitness_upto = data.get("fitness_upto", "N/A")
-    tax_upto = data.get("tax_upto", "N/A")
-    insurance_expiry = ("insurance_expiry", "N/A")
-    number = data.get("vehicle_number") or searched_number
-    rto = info.get("rto_code", "N/A")
+    owner_name = info.get("owner_name", "N/A")
+    father_name = info.get("father_name", "N/A")
+
+    vehicle_number = info.get("reg_no") or data.get("vehicle_number") or searched_number
+
+    maker_model = info.get("maker_model", "N/A")
+    vehicle_class = info.get("vehicle_class", "N/A")
+
+    city = info.get("city", "N/A")
+    rto = info.get("rto", "N/A")
+    rto_code = info.get("rto_code", "N/A")
+
     address = info.get("address", "N/A")
-    state = info.get("state", "N/A")
     phone = info.get("phone", "N/A")
+
+    fuel_type = info.get("fuel_type", "N/A")
+    fuel_norms = info.get("fuel_norms", "N/A")
+
+    chassis_no = info.get("chassis_no", "N/A")
+    engine_no = info.get("engine_no", "N/A")
+
+    insurance_company = info.get("insurance_company", "N/A")
+    insurance_expiry = info.get("insurance_expiry", "N/A")
+
+    reg_date = info.get("reg_date", "N/A")
+    vehicle_age = info.get("vehicle_age", "N/A")
+    fitness_upto = info.get("fitness_upto", "N/A")
+    tax_upto = info.get("tax_upto", "N/A")
 
     return f"""
 🚗 Vehicle Lookup Result
 
-📛 Owner Name: {owner_name}
-🎅 Father Name: {father_name}
-🔢 Vehicle Number: {number}
-🚘 Model Number: {model_number}
+👤 Owner Name: {owner_name}
+👨 Father Name: {father_name}
 
-🎾 Rto: {rto}
-🏢 RTO Code: {rto}
+🔢 Vehicle Number: {vehicle_number}
+🚘 Model: {maker_model}
+🚙 Class: {vehicle_class}
+
+🏢 RTO: {rto}
+🧾 RTO Code: {rto_code}
 🏙 City: {city}
-📍 Address: {address}
-🌎 State: {state}
+
+📍 Address:
+{address}
 
 ☎️ RTO Phone: {phone}
 
-━━━━━━━━━━━━━━
-🔎 Data Source: @captainpapaj1
-"""
+⛽ Fuel Type: {fuel_type}
+📊 Fuel Norms: {fuel_norms}
 
-#================== VEHICLE RESULT FORMATER=======
+🛠 Engine No: {engine_no}
+🔩 Chassis No: {chassis_no}
 
-def format_upi_result(data):
+🛡 Insurance: {insurance_company}
+📅 Insurance Expiry: {insurance_expiry}
 
-    return f"""
-💳 UPI Lookup
+📅 Registration Date: {reg_date}
+📆 Fitness Upto: {fitness_upto}
+💰 Tax Upto: {tax_upto}
 
-👤 Name: {data.get("account_name","N/A")}
-📱 UPI ID: {data.get("upi_id","N/A")}
-
-🏦 Bank: {data.get("bank","N/A")}
-🔑 IFSC: {data.get("ifsc","N/A")}
-
-⚙️ PSP: {data.get("psp","N/A")}
-🏪 Merchant: {data.get("is_merchant","N/A")}
+⌛ Vehicle Age: {vehicle_age}
 
 ━━━━━━━━━━━━━━
 🔎 Data Source: @captainpapaj1
