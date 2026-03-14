@@ -469,7 +469,7 @@ N/A
     for item in results[:5]:
 
         name = item.get("name", "N/A")
-        father = item.get("father_name", "N/A")
+        father = item.get("father name", "N/A")
         mobile = item.get("mobile", "N/A")
         alt = item.get("alternative_mobile") or "N/A"
         circle = item.get("circle/sim", "N/A")
