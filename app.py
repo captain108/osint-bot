@@ -573,7 +573,7 @@ def format_vehicle_result(data, searched_number):
 📛 Owner Name: {owner_name}
 🎅 Father Name: {father_name}
 🔢 Vehicle Number: {number}
-🚘 Model Number: {model_number]
+🚘 Model Number: {model_number}
 
 🎾 Rto: {rto}
 🏢 RTO Code: {rto}
