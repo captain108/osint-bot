@@ -24,6 +24,12 @@ groups_col = db["groups"]
 gc_col = db["approved_gc"]
 usage_col = db["usage"]
 
+users_col.create_index("user_id")
+premium_col.create_index("user_id")
+groups_col.create_index("chat_id")
+gc_col.create_index("chat_id")
+usage_col.create_index("user_id")
+
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 OWNER_ID = int(os.getenv("OWNER_ID", "0"))
