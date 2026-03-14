@@ -48,40 +48,10 @@ RESULT_MODE = os.getenv("RESULT_MODE", "ui")
 # json  = raw API JSON
 # pretty = formatted UX result
 
-USAGE_FILE = "usage.json"
-PREMIUM_FILE = "premium.json"
-USERS_FILE = "users.json"
-GC_FILE = "approved_gc.json"
-GROUPS_FILE = "groups.json"
-
 CACHE = {}
 CACHE_TTL = 3600
 
-# ================= FILE UTILS =================
-
-def load_json(path):
-    try:
-        with open(path, "r") as f:
-            return json.load(f)
-    except:
-        return {}
-
-def save_json(path, data):
-    with open(path, "w") as f:
-        json.dump(data, f, indent=2)
-
 # ================= USER DATABASE =================
-
-def load_users():
-    try:
-        with open(USERS_FILE, "r") as f:
-            return json.load(f)
-    except:
-        return []
-
-def save_users(users):
-    with open(USERS_FILE, "w") as f:
-        json.dump(users, f)
 
 def add_user(user_id):
 
@@ -92,31 +62,9 @@ def add_user(user_id):
             "joined": int(time.time())
         })
 
-# ================= GROUP DATABASE =================
-
-def load_gc():
-    try:
-        with open(GC_FILE, "r") as f:
-            return json.load(f)
-    except:
-        return []
-
-def save_gc(groups):
-    with open(GC_FILE, "w") as f:
-        json.dump(groups, f, indent=2)
 
 # ================= GROUP LIST DATABASE =================
 
-def load_groups():
-    try:
-        with open(GROUPS_FILE, "r") as f:
-            return json.load(f)
-    except:
-        return []
-
-def save_groups(groups):
-    with open(GROUPS_FILE, "w") as f:
-        json.dump(groups, f)
 
 def add_group(chat_id):
 
