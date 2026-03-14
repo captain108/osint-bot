@@ -606,6 +606,51 @@ def format_vehicle_result(data, searched_number):
 🔎 Data Source: @captainpapaj1
 """
 
+#================== VEHICLE RESULT FORMATER=======
+
+def format_upi_result(data):
+
+    return f"""
+💳 UPI Lookup
+
+👤 Name: {data.get("account_name","N/A")}
+📱 UPI ID: {data.get("upi_id","N/A")}
+
+🏦 Bank: {data.get("bank","N/A")}
+🔑 IFSC: {data.get("ifsc","N/A")}
+
+⚙️ PSP: {data.get("psp","N/A")}
+🏪 Merchant: {data.get("is_merchant","N/A")}
+
+━━━━━━━━━━━━━━
+🔎 Data Source: @captainpapaj1
+"""
+
+#================== FREE FIRE FORMATTER ==========
+
+def format_ff_result(data):
+
+    info = data.get("info", {})
+
+    return f"""
+🎮 Free Fire Player
+
+👤 Nickname: {info.get("👤 Nickname","N/A")}
+🆔 UID: {info.get("🆔 ID","N/A")}
+
+🌎 Region: {info.get("🌎 Region","N/A")}
+🎖 Level: {info.get("🎖️ Level","N/A")}
+
+🏆 Ranked Points: {info.get("🏆 Ranked Points","N/A")}
+👍 Likes: {info.get("👍 Likes","N/A")}
+
+📅 Created: {info.get("📅 Account Created","N/A")}
+🕒 Last Login: {info.get("🕒 Last Login","N/A")}
+
+━━━━━━━━━━━━━━
+🔎 Data Source: @captainpapaj1
+"""
+
 # ================= JSON CLEANER =================
 
 def clean_api_credits(data):
