@@ -8,8 +8,22 @@ import html
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
+from pymongo import MongoClient
 
 # ================= VARIABLES =================
+
+MONGO_URI = os.getenv("MONGO_URI")
+
+mongo = MongoClient(MONGO_URI)
+
+db = mongo["osint_bot"]
+
+users_col = db["users"]
+premium_col = db["premium"]
+groups_col = db["groups"]
+gc_col = db["approved_gc"]
+usage_col = db["usage"]
+
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 OWNER_ID = int(os.getenv("OWNER_ID", "0"))
@@ -65,11 +79,12 @@ def save_users(users):
 
 def add_user(user_id):
 
-    users = load_users()
+    if not users_col.find_one({"user_id": user_id}):
 
-    if user_id not in users:
-        users.append(user_id)
-        save_users(users)
+        users_col.insert_one({
+            "user_id": user_id,
+            "joined": int(time.time())
+        })
 
 # ================= GROUP DATABASE =================
 
@@ -99,36 +114,46 @@ def save_groups(groups):
 
 def add_group(chat_id):
 
-    groups = load_groups()
-
-    if chat_id not in groups:
-        groups.append(chat_id)
-        save_groups(groups)
-
+    groups_col.update_one(
+        {"chat_id": chat_id},
+        {"$set": {"chat_id": chat_id}},
+        upsert=True
+    )
+    
 # ================= DAILY LIMIT =================
 
 def check_daily_limit(user_id):
 
-    data = load_json(USAGE_FILE)
-
     today = int(time.time() // 86400)
-    user = str(user_id)
 
-    if user not in data:
-        data[user] = {"day": today, "count": 1}
-        save_json(USAGE_FILE, data)
+    data = usage_col.find_one({"user_id": user_id})
+
+    if not data:
+
+        usage_col.insert_one({
+            "user_id": user_id,
+            "day": today,
+            "count": 1
+        })
+
         return True
 
-    if data[user]["day"] != today:
-        data[user] = {"day": today, "count": 1}
-        save_json(USAGE_FILE, data)
+    if data["day"] != today:
+
+        usage_col.update_one(
+            {"user_id": user_id},
+            {"$set": {"day": today, "count": 1}}
+        )
+
         return True
 
-    if data[user]["count"] >= 3:
+    if data["count"] >= 3:
         return False
 
-    data[user]["count"] += 1
-    save_json(USAGE_FILE, data)
+    usage_col.update_one(
+        {"user_id": user_id},
+        {"$inc": {"count": 1}}
+    )
 
     return True
 
@@ -142,31 +167,25 @@ def save_premium(data):
 
 def is_premium(user_id):
 
-    data = load_premium()
-    user = str(user_id)
+    data = premium_col.find_one({"user_id": user_id})
 
-    if user not in data:
+    if not data:
         return False
 
-    expire = data[user]["expire"]
-
-    if time.time() > expire:
-        del data[user]
-        save_premium(data)
+    if time.time() > data["expire"]:
+        premium_col.delete_one({"user_id": user_id})
         return False
 
     return True
 
 def get_remaining(user_id):
 
-    data = load_premium()
-    user = str(user_id)
+    data = premium_col.find_one({"user_id": user_id})
 
-    if user not in data:
+    if not data:
         return None
 
-    expire = data[user]["expire"]
-    remaining = expire - time.time()
+    remaining = data["expire"] - time.time()
 
     if remaining <= 0:
         return None
@@ -297,16 +316,16 @@ async def addpremium(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Usage:\n/addpremium USER_ID DAYS")
         return
 
-    user = context.args[0]
+    user = int(context.args[0])
     days = int(context.args[1])
 
-    expire = time.time() + days*86400
+    expire = time.time() + days * 86400
 
-    data = load_premium()
-
-    data[user] = {"expire": expire}
-
-    save_premium(data)
+    premium_col.update_one(
+        {"user_id": user},
+        {"$set": {"expire": expire}},
+        upsert=True
+    )
 
     await update.message.reply_text("✅ Premium added")
 
@@ -317,9 +336,13 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
         return
 
-    users = load_users()
-    groups = load_groups()
-    targets = users + groups
+    targets = []
+
+    for u in users_col.find():
+        targets.append(u["user_id"])
+
+    for g in groups_col.find():
+        targets.append(g["chat_id"])
 
     sent = 0
 
@@ -367,11 +390,11 @@ async def approvegc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ This command must be used in a group.")
         return
 
-    groups = load_gc()
-
-    if chat.id not in groups:
-        groups.append(chat.id)
-        save_gc(groups)
+    gc_col.update_one(
+    {"chat_id": chat.id},
+    {"$set": {"chat_id": chat.id}},
+    upsert=True
+)
 
     await update.message.reply_text("✅ This group has been approved.")
 
@@ -382,7 +405,7 @@ async def gclist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
         return
 
-    groups = load_gc()
+    groups = list(gc_col.find())
 
     if not groups:
         await update.message.reply_text("❌ No approved groups.")
@@ -390,8 +413,8 @@ async def gclist(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     text = "✅ Approved Groups:\n\n"
 
-    for gid in groups:
-        text += f"{gid}\n"
+    for g in groups:
+        text += f"{g['chat_id']}\n"
 
     await update.message.reply_text(text)
 
@@ -402,16 +425,11 @@ async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
         return
 
-    users = load_users()
-    groups = load_groups()
-    premium = load_premium()
-    usage = load_json(USAGE_FILE)
-
-    total_users = len(users)
-    total_groups = len(groups)
-    total_premium = len(premium)
-    total_requests = len(usage)
-
+    total_users = users_col.count_documents({})
+    total_groups = groups_col.count_documents({})
+    total_premium = premium_col.count_documents({})
+    total_requests = usage_col.count_documents({})
+   
     await update.message.reply_text(
 f"""
 📊 {BOT_NAME} Stats
@@ -736,8 +754,7 @@ async def call_api(update, api_url, value):
         limit_needed = False
 
     if chat.type in ["group", "supergroup"]:
-        groups = load_gc()
-        if chat.id in groups:
+        if gc_col.find_one({"chat_id": chat.id}):
             limit_needed = False
 
     if limit_needed:
@@ -1050,25 +1067,19 @@ async def premium_watcher(application):
 
     while True:
 
-        data = load_premium()
+        for user in premium_col.find():
 
-        for user in list(data.keys()):
-
-            expire = data[user]["expire"]
-
-            if time.time() > expire:
+            if time.time() > user["expire"]:
 
                 try:
                     await application.bot.send_message(
-                        int(user),
+                        user["user_id"],
                         "❌ Your premium has expired."
                     )
                 except:
                     pass
 
-                del data[user]
-
-        save_premium(data)
+                premium_col.delete_one({"user_id": user["user_id"]})
 
         await asyncio.sleep(3600)
 
