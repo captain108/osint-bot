@@ -55,12 +55,11 @@ CACHE_TTL = 3600
 
 def add_user(user_id):
 
-    if not users_col.find_one({"user_id": user_id}):
-
-        users_col.insert_one({
-            "user_id": user_id,
-            "joined": int(time.time())
-        })
+    users_col.update_one(
+    {"user_id": user_id},
+    {"$setOnInsert": {"joined": int(time.time())}},
+    upsert=True
+)
 
 
 # ================= GROUP LIST DATABASE =================
@@ -720,7 +719,7 @@ Owner: {OWNER_USERNAME}
 
     # ================= CACHE CHECK =================
 
-    cache_key = f"{api_url}_{value}"
+    cache_key = f"{hash(api_url)}:{value}"
 
     if cache_key in CACHE:
 
