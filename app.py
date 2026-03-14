@@ -684,12 +684,11 @@ Owner: {OWNER_USERNAME}
             data = r.json()
 
             # remove original API credits
-            data = r.json()
-
             data = clean_api_credits(data)
-        except:
-            await update.message.reply_text("❌ API returned invalid JSON")
-            return
+
+       except:
+           await update.message.reply_text("❌ API returned invalid JSON")
+           return
 
         # -------- HANDLE NO DATA FROM API --------
       
@@ -906,8 +905,8 @@ async def json_download(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     key = query.data.split("_")[1]
 
-    data = CACHE.get(key)
-
+    data = clean_api_credits(CACHE.get(key))
+ 
     if not data:
         return
 
