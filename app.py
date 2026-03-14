@@ -345,10 +345,10 @@ async def approvegc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     gc_col.update_one(
-    {"chat_id": chat.id},
-    {"$set": {"chat_id": chat.id}},
-    upsert=True
-)
+        {"chat_id": chat.id},
+        {"$set": {"chat_id": chat.id}},
+        upsert=True
+    )
 
     await update.message.reply_text("✅ This group has been approved.")
 
