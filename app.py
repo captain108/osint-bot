@@ -513,7 +513,7 @@ def format_tg_result(data, target_id):
         return "❌ No result found."
 
     # Extract fields safely
-    country = data.get("country", "N/A")
+    country = data.get("country_code", "N/A")
     code = data.get("country_code", "N/A")
     number = data.get("number", "N/A")
     username = data.get("username")
