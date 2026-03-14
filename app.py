@@ -686,9 +686,9 @@ Owner: {OWNER_USERNAME}
             # remove original API credits
             data = clean_api_credits(data)
 
-       except:
-           await update.message.reply_text("❌ API returned invalid JSON")
-           return
+        except:
+            await update.message.reply_text("❌ API returned invalid JSON")
+            return
 
         # -------- HANDLE NO DATA FROM API --------
       
