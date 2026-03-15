@@ -408,8 +408,8 @@ async def premiumlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         remaining = expire - time.time()
 
-       days = int(remaining // 86400)
-       hours = int((remaining % 86400) // 3600)
+        days = int(remaining // 86400)
+        hours = int((remaining % 86400) // 3600)
 
         try:
             user = await context.bot.get_chat(user_id)
@@ -433,24 +433,39 @@ async def premiumlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ================= USER LIST =================
 
+USERS_PER_PAGE = 10
+
 async def userlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if update.effective_user.id != OWNER_ID:
         return
 
+    page = 0
+    if context.args:
+        try:
+            page = int(context.args[0])
+        except:
+            page = 0
+
     users = list(users_col.find())
 
-    if not users:
+    total = len(users)
+
+    if total == 0:
         await update.message.reply_text("❌ No users found.")
         return
 
-    text = "👤 Bot Users\n\n"
+    start = page * USERS_PER_PAGE
+    end = start + USERS_PER_PAGE
 
-    for u in users:
+    selected = users[start:end]
+
+    text = f"👤 Bot Users\nPage {page+1}\n\n"
+
+    for u in selected:
 
         user_id = u["user_id"]
 
-        # check premium
         premium = premium_col.find_one({"user_id": user_id})
 
         try:
@@ -471,11 +486,96 @@ async def userlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text += f"🆔 <code>{user_id}</code>\n"
 
         if premium:
-            text += "⭐ Premium User\n"
+            text += "⭐ Premium\n"
 
-        text += "\n━━━━━━━━━━━━━━\n\n"
+        text += "\n"
 
-    await update.message.reply_text(text[:4000], parse_mode="HTML")
+    # ===== Buttons =====
+    buttons = []
+
+    if page > 0:
+        buttons.append(
+            InlineKeyboardButton("⬅ Previous", callback_data=f"userpage_{page-1}")
+        )
+
+    if end < total:
+        buttons.append(
+            InlineKeyboardButton("Next ➡", callback_data=f"userpage_{page+1}")
+        )
+
+    keyboard = InlineKeyboardMarkup([buttons]) if buttons else None
+
+    await update.message.reply_text(
+        text,
+        parse_mode="HTML",
+        reply_markup=keyboard
+    )
+
+# ================= USER LIST PAGE =================
+
+async def userlist_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    query = update.callback_query
+    await query.answer()
+
+    page = int(query.data.split("_")[1])
+
+    users = list(users_col.find())
+
+    start = page * USERS_PER_PAGE
+    end = start + USERS_PER_PAGE
+
+    selected = users[start:end]
+
+    text = f"👤 Bot Users\nPage {page+1}\n\n"
+
+    for u in selected:
+
+        user_id = u["user_id"]
+
+        premium = premium_col.find_one({"user_id": user_id})
+
+        try:
+            user = await context.bot.get_chat(user_id)
+
+            name = user.first_name or "User"
+            username = user.username
+
+            if username:
+                link = f"https://t.me/{username}"
+                text += f"👤 <a href='{link}'>{name}</a>\n"
+            else:
+                text += f"👤 {name}\n"
+
+        except:
+            text += "👤 Unknown\n"
+
+        text += f"🆔 <code>{user_id}</code>\n"
+
+        if premium:
+            text += "⭐ Premium\n"
+
+        text += "\n"
+
+    buttons = []
+
+    if page > 0:
+        buttons.append(
+            InlineKeyboardButton("⬅ Previous", callback_data=f"userpage_{page-1}")
+        )
+
+    if end < len(users):
+        buttons.append(
+            InlineKeyboardButton("Next ➡", callback_data=f"userpage_{page+1}")
+        )
+
+    keyboard = InlineKeyboardMarkup([buttons]) if buttons else None
+
+    await query.edit_message_text(
+        text,
+        parse_mode="HTML",
+        reply_markup=keyboard
+    )
 
 # ================= STATS =================
 
