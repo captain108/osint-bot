@@ -812,32 +812,42 @@ Owner: {OWNER_USERNAME}
             await update.message.reply_text("❌ API returned invalid JSON")
             return
 
-        # -------- HANDLE NO DATA FROM API --------
-      
+        # -------- HANDLE API ERRORS / NO DATA --------
+
+        error_msg = str(data.get("error","")).lower()
+
+        # Detect API maintenance
+        if "maintenance" in error_msg:
+            await update.message.reply_text(
+                "⚠️ API is currently under maintenance.\nPlease try again later."
+            )
+            return
+
+        # Detect no data situations
         if (
             data.get("success") is False
             or "no matching records" in str(data.get("message","")).lower()
-            or "no data" in str(data.get("error","")).lower()
-            or data.get("result") == [] or data.get("results") == []
+            or "no data" in error_msg
+            or data.get("result") == []
+            or data.get("results") == []
         ):
             await update.message.reply_text(
                 "🔎 Search Result\n\n❌ No data found."
             )
             return
 
+
         # Generate unique ID for this response
         uid = str(uuid.uuid4())
 
-        # Store result in cache so it can be downloaded later
+        # Store result for JSON download
         CACHE[uid] = data
 
-        # save search cache
-        # save search cache
+        # Save search cache
         CACHE[cache_key] = {
             "data": data,
             "time": time.time()
         }
-
 
         # ================= FORMAT RESULT =================
 
