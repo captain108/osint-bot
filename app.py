@@ -727,6 +727,38 @@ async def cache_cleaner():
 
         await asyncio.sleep(600)  # clean every 10 minutes
 
+# ================= USERNAME RESOLVER =================
+
+async def resolve_username(context, username):
+
+    try:
+        chat = await context.bot.get_chat(username)
+
+        if chat and chat.id:
+            return str(chat.id)
+
+    except:
+        pass
+
+    return None
+
+# ================= MULTI API FALLBACK =================
+
+def get_api_list(primary):
+
+    apis = [primary]
+
+    api2 = os.getenv(primary + "_2")
+    api3 = os.getenv(primary + "_3")
+
+    if api2:
+        apis.append(api2)
+
+    if api3:
+        apis.append(api3)
+
+    return apis
+
 # ================= API CALL =================
 
 async def call_api(update, api_url, value):
@@ -790,28 +822,49 @@ Owner: {OWNER_USERNAME}
 
             return
     
-    # ---------  API REQUEST  ----------
+    # --------- API REQUEST ----------
     try:
 
-        # Send request to API with the provided value
-        url = api_url.format(value.strip()) if "{}" in api_url else f"{api_url}{value.strip()}"
-        r = requests.get(url, timeout=15)
-        # Check if API responded successfully
-        if r.status_code != 200:
-            await update.message.reply_text("❌ No data found.")
+        api_list = [api_url]
+
+        # additional APIs
+        alt2 = os.getenv(api_url + "_2")
+        alt3 = os.getenv(api_url + "_3")
+
+        if alt2:
+            api_list.append(alt2)
+
+        if alt3:
+            api_list.append(alt3)
+
+        data = None
+
+        for api in api_list:
+
+            try:
+
+                url = api.format(value.strip()) if "{}" in api else f"{api}{value.strip()}"
+
+                r = requests.get(url, timeout=20)
+
+                if r.status_code != 200:
+                    continue
+
+                data = r.json()
+
+                # clean credits
+                data = clean_api_credits(data)
+
+                if data:
+                    break
+    
+            except:
+                continue
+
+        if not data:
+            await update.message.reply_text("❌ All API servers failed.")
             return
-
-        # Try converting response into JSON
-        try:
-            data = r.json()
-
-            # remove original API credits
-            data = clean_api_credits(data)
-
-        except:
-            await update.message.reply_text("❌ API returned invalid JSON")
-            return
-
+        
         # -------- HANDLE API ERRORS / NO DATA --------
 
         error_msg = str(data.get("error","")).lower()
@@ -978,8 +1031,23 @@ async def tg(update, context):
     value = get_value(update, context)
 
     if not value:
-        await update.message.reply_text("Usage:\n/tg TG_ID\nor reply to ID.")
+        await update.message.reply_text(
+            "Usage:\n/tg USER_ID or @username"
+        )
         return
+
+    # If username provided
+    if value.startswith("@"):
+
+        resolved = await resolve_username(context, value)
+
+        if not resolved:
+            await update.message.reply_text(
+                "❌ Cannot resolve username to ID.\nUser must interact with bot first."
+            )
+            return
+
+        value = resolved
 
     await call_api(update, TG_API, value)
 
@@ -1089,6 +1157,76 @@ async def start_background(application):
     asyncio.create_task(premium_watcher(application))
     asyncio.create_task(cache_cleaner())
 
+# ================= API CHECK =================
+
+async def apicheck(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    api_groups = {
+        "NUM": [NUM_API, os.getenv("NUM_API_2"), os.getenv("NUM_API_3")],
+        "TG": [TG_API, os.getenv("TG_API_2"), os.getenv("TG_API_3")],
+        "VEH": [VEH_API, os.getenv("VEH_API_2"), os.getenv("VEH_API_3")],
+        "UPI": [UPI_API, os.getenv("UPI_API_2"), os.getenv("UPI_API_3")],
+        "INSTA": [INSTA_API, os.getenv("INSTA_API_2"), os.getenv("INSTA_API_3")],
+        "FAM": [FAM_API, os.getenv("FAM_API_2"), os.getenv("FAM_API_3")],
+        "FF": [FF_API, os.getenv("FF_API_2"), os.getenv("FF_API_3")]
+    }
+
+    text = "🔎 API Diagnostic\n\n"
+
+    for name, apis in api_groups.items():
+
+        for i, url in enumerate(apis, start=1):
+
+            if not url:
+                continue
+
+            label = f"{name}{i}"
+
+            try:
+
+                start = time.time()
+
+                test_url = url.replace("{}", "1")
+
+                r = requests.get(test_url, timeout=10)
+
+                latency = int((time.time() - start) * 1000)
+
+                if r.status_code != 200:
+                    text += f"{label} → ❌ HTTP {r.status_code}\n"
+                    continue
+
+                try:
+                    data = r.json()
+                except ValueError:
+                    text += f"{label} → ⚠ Invalid JSON\n"
+                    continue
+
+                if data.get("success") is False:
+
+                    err = data.get("error") or data.get("message") or "API error"
+
+                    text += f"{label} → ❌ {err}\n"
+
+                else:
+
+                    text += f"{label} → ✅ {latency}ms\n"
+
+            except requests.exceptions.Timeout:
+
+                text += f"{label} → ⏱ Timeout\n"
+
+            except Exception:
+
+                text += f"{label} → ❌ Offline\n"
+
+        text += "\n"
+
+    await update.message.reply_text(text)
+
 # ================= MAIN =================
 
 def main():
@@ -1115,6 +1253,7 @@ def main():
     app.add_handler(CommandHandler("gclist", gclist))
     app.add_handler(CommandHandler("stats", stats))
     app.add_handler(CommandHandler("cache", cachestats))
+    app.add_handler(CommandHandler("apicheck", apicheck))
 
     app.add_handler(CallbackQueryHandler(json_download, pattern="json_"))
 
