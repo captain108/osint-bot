@@ -358,12 +358,70 @@ async def gclist(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ No approved groups.")
         return
 
-    text = "✅ Approved Groups:\n\n"
+    text = "👥 Approved Groups\n\n"
 
     for g in groups:
-        text += f"{g['chat_id']}\n"
 
-    await update.message.reply_text(text)
+        chat_id = g["chat_id"]
+
+        try:
+            chat = await context.bot.get_chat(chat_id)
+
+            name = chat.title or "Unknown"
+            username = chat.username
+
+            text += f"📛 Name: {name}\n"
+            text += f"🆔 ID: <code>{chat_id}</code>\n"
+
+            if username:
+                link = f"https://t.me/{username}"
+                text += f"🔗 <a href='{link}'>Open Group</a>\n"
+
+        except:
+            text += f"📛 Name: Unknown\n"
+            text += f"🆔 ID: <code>{chat_id}</code>\n"
+
+        text += "\n━━━━━━━━━━━━━━\n\n"
+
+    await update.message.reply_text(text, parse_mode="HTML")
+    
+#================== PREMIUM LIST ==================================
+
+async def premiumlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    users = list(premium_col.find())
+
+    if not users:
+        await update.message.reply_text("❌ No premium users.")
+        return
+
+    text = "⭐ Premium Users\n\n"
+
+    for u in users:
+
+        user_id = u["user_id"]
+
+        try:
+            user = await context.bot.get_chat(user_id)
+
+            name = user.first_name or "User"
+            username = user.username
+
+            if username:
+                link = f"https://t.me/{username}"
+                text += f"👤 <a href='{link}'>{name}</a>\n"
+            else:
+                text += f"👤 {name}\nID: <code>{user_id}</code>\n"
+
+        except:
+            text += f"👤 ID: <code>{user_id}</code>\n"
+
+        text += "\n"
+
+    await update.message.reply_text(text, parse_mode="HTML")
 
 # ================= STATS =================
 
@@ -1254,7 +1312,8 @@ def main():
     app.add_handler(CommandHandler("stats", stats))
     app.add_handler(CommandHandler("cache", cachestats))
     app.add_handler(CommandHandler("apicheck", apicheck))
-
+    app.add_handler(CommandHandler("premiumlist", premiumlist))
+    
     app.add_handler(CallbackQueryHandler(json_download, pattern="json_"))
 
     print(f"{BOT_NAME} Running")
