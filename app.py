@@ -431,6 +431,52 @@ async def premiumlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(text, parse_mode="HTML")
 
+# ================= USER LIST =================
+
+async def userlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    users = list(users_col.find())
+
+    if not users:
+        await update.message.reply_text("❌ No users found.")
+        return
+
+    text = "👤 Bot Users\n\n"
+
+    for u in users:
+
+        user_id = u["user_id"]
+
+        # check premium
+        premium = premium_col.find_one({"user_id": user_id})
+
+        try:
+            user = await context.bot.get_chat(user_id)
+
+            name = user.first_name or "User"
+            username = user.username
+
+            if username:
+                link = f"https://t.me/{username}"
+                text += f"👤 <a href='{link}'>{name}</a>\n"
+            else:
+                text += f"👤 {name}\n"
+
+        except:
+            text += f"👤 Unknown\n"
+
+        text += f"🆔 <code>{user_id}</code>\n"
+
+        if premium:
+            text += "⭐ Premium User\n"
+
+        text += "\n━━━━━━━━━━━━━━\n\n"
+
+    await update.message.reply_text(text[:4000], parse_mode="HTML")
+
 # ================= STATS =================
 
 async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1321,7 +1367,8 @@ def main():
     app.add_handler(CommandHandler("cache", cachestats))
     app.add_handler(CommandHandler("apicheck", apicheck))
     app.add_handler(CommandHandler("premiumlist", premiumlist))
-    
+    app.add_handler(CommandHandler("userlist", userlist))
+
     app.add_handler(CallbackQueryHandler(json_download, pattern="json_"))
 
     print(f"{BOT_NAME} Running")
