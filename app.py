@@ -393,15 +393,29 @@ async def premiumlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != OWNER_ID:
         return
 
+    page = 0
+    if context.args:
+        try:
+            page = int(context.args[0])
+        except:
+            page = 0
+
     users = list(premium_col.find())
 
-    if not users:
+    total = len(users)
+
+    if total == 0:
         await update.message.reply_text("❌ No premium users.")
         return
 
-    text = "⭐ Premium Users\n\n"
+    start = page * PREMIUM_PER_PAGE
+    end = start + PREMIUM_PER_PAGE
 
-    for u in users:
+    selected = users[start:end]
+
+    text = f"⭐ Premium Users\nPage {page+1}\n\n"
+
+    for u in selected:
 
         user_id = u["user_id"]
         expire = u.get("expire", 0)
@@ -420,16 +434,102 @@ async def premiumlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if username:
                 link = f"https://t.me/{username}"
                 text += f"👤 <a href='{link}'>{name}</a>\n"
-                text += f"⏳ {days}d {hours}h remaining\n"
             else:
-                text += f"👤 {name}\nID: <code>{user_id}</code>\n"
+                text += f"👤 {name}\n"
+                text += f"🆔 <code>{user_id}</code>\n"
 
         except:
-            text += f"👤 ID: <code>{user_id}</code>\n"
+            text += f"👤 Unknown\n"
+            text += f"🆔 <code>{user_id}</code>\n"
 
-        text += "\n"
+        text += f"⏳ {days}d {hours}h remaining\n\n"
 
-    await update.message.reply_text(text, parse_mode="HTML")
+    buttons = []
+
+    if page > 0:
+        buttons.append(
+            InlineKeyboardButton("⬅ Previous", callback_data=f"prempage_{page-1}")
+        )
+
+    if end < total:
+        buttons.append(
+            InlineKeyboardButton("Next ➡", callback_data=f"prempage_{page+1}")
+        )
+
+    keyboard = InlineKeyboardMarkup([buttons]) if buttons else None
+
+    await update.message.reply_text(
+        text,
+        parse_mode="HTML",
+        reply_markup=keyboard
+    )
+
+#================= PREMIUM LIST PAGE ========== 
+
+async def premiumlist_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    query = update.callback_query
+    await query.answer()
+
+    page = int(query.data.split("_")[1])
+
+    users = list(premium_col.find())
+
+    start = page * PREMIUM_PER_PAGE
+    end = start + PREMIUM_PER_PAGE
+
+    selected = users[start:end]
+
+    text = f"⭐ Premium Users\nPage {page+1}\n\n"
+
+    for u in selected:
+
+        user_id = u["user_id"]
+        expire = u.get("expire", 0)
+
+        remaining = expire - time.time()
+
+        days = int(remaining // 86400)
+        hours = int((remaining % 86400) // 3600)
+
+        try:
+            user = await context.bot.get_chat(user_id)
+
+            name = user.first_name or "User"
+            username = user.username
+
+            if username:
+                link = f"https://t.me/{username}"
+                text += f"👤 <a href='{link}'>{name}</a>\n"
+            else:
+                text += f"👤 {name}\n"
+                text += f"🆔 <code>{user_id}</code>\n"
+
+        except:
+            text += f"👤 Unknown\n"
+            text += f"🆔 <code>{user_id}</code>\n"
+
+        text += f"⏳ {days}d {hours}h remaining\n\n"
+
+    buttons = []
+
+    if page > 0:
+        buttons.append(
+            InlineKeyboardButton("⬅ Previous", callback_data=f"prempage_{page-1}")
+        )
+
+    if end < len(users):
+        buttons.append(
+            InlineKeyboardButton("Next ➡", callback_data=f"prempage_{page+1}")
+        )
+
+    keyboard = InlineKeyboardMarkup([buttons]) if buttons else None
+
+    await query.edit_message_text(
+        text,
+        parse_mode="HTML",
+        reply_markup=keyboard
+    )
 
 # ================= USER LIST =================
 
@@ -1467,8 +1567,10 @@ def main():
     app.add_handler(CommandHandler("cache", cachestats))
     app.add_handler(CommandHandler("apicheck", apicheck))
     app.add_handler(CommandHandler("premiumlist", premiumlist))
+    app.add_handler(CallbackQueryHandler(premiumlist_page, pattern="prempage_"))
     app.add_handler(CommandHandler("userlist", userlist))
-
+    app.add_handler(CallbackQueryHandler(userlist_page, pattern="userpage_"))
+    
     app.add_handler(CallbackQueryHandler(json_download, pattern="json_"))
 
     print(f"{BOT_NAME} Running")
