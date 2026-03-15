@@ -636,6 +636,26 @@ def format_ff_result(data):
 🔎 Data Source: @captainpapaj1
 """
 
+# ================= UPI RESULT FORMATTER =================
+
+def format_upi_result(data):
+
+    return f"""
+💳 UPI Lookup Result
+
+👤 Name: {data.get("account_name","N/A")}
+📱 UPI ID: {data.get("upi_id","N/A")}
+
+🏦 Bank: {data.get("bank","N/A")}
+🔑 IFSC: {data.get("ifsc","N/A")}
+
+⚙️ PSP: {data.get("psp","N/A")}
+🏪 Merchant: {data.get("is_merchant","N/A")}
+
+━━━━━━━━━━━━━━
+🔎 Data Source: {OWNER_USERNAME}
+"""
+
 # ================= JSON CLEANER =================
 
 def clean_api_credits(data):
