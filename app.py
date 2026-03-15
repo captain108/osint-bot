@@ -419,6 +419,7 @@ async def premiumlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if username:
                 link = f"https://t.me/{username}"
                 text += f"👤 <a href='{link}'>{name}</a>\n"
+                text += f"⏳ {days}d {hours}h remaining\n"
             else:
                 text += f"👤 {name}\nID: <code>{user_id}</code>\n"
 
