@@ -403,6 +403,12 @@ async def premiumlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for u in users:
 
         user_id = u["user_id"]
+        expire = u.get("expire", 0)
+
+        remaining = expire - time.time()
+
+       days = int(remaining // 86400)
+       hours = int((remaining % 86400) // 3600)
 
         try:
             user = await context.bot.get_chat(user_id)
