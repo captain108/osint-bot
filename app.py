@@ -832,7 +832,8 @@ Owner: {OWNER_USERNAME}
         CACHE[uid] = data
 
         # save search cache
-        CACHE[f"{api_url}_{value}"] = {
+        # save search cache
+        CACHE[cache_key] = {
             "data": data,
             "time": time.time()
         }
