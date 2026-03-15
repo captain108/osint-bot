@@ -378,14 +378,15 @@ async def gclist(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text += f"🔗 <a href='{link}'>Open Group</a>\n"
 
         except:
-            text += f"📛 Name: Unknown\n"
+            text += f"📛 Name: Inaccessible\n"
             text += f"🆔 ID: <code>{chat_id}</code>\n"
+            text += f"⚠ Bot not in group\n"
 
         text += "\n━━━━━━━━━━━━━━\n\n"
 
     await update.message.reply_text(text, parse_mode="HTML")
     
-#================== PREMIUM LIST ==================================
+# ================== PREMIUM LIST ==================================
 
 async def premiumlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
